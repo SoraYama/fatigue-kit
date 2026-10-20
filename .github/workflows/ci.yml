@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22, 24]
+        # Calendar rules must behave identically across timezones and across
+        # DST transitions, so the same suite runs under several TZ settings.
+        timezone: [UTC, Asia/Shanghai, America/New_York]
+        exclude:
+          - node-version: 20
+            timezone: America/New_York
+          - node-version: 22
+            timezone: Asia/Shanghai
+    runs-on: ubuntu-latest
+    env:
+      TZ: ${{ matrix.timezone }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test
+      - run: npm run build
+      - run: npm run size
+        if: matrix.node-version == 22 && matrix.timezone == 'UTC'

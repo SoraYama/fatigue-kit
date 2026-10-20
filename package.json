@@ -1,0 +1,128 @@
+{
+  "name": "fatigue-kit",
+  "version": "0.1.0",
+  "description": "Zero-dependency frequency capping (疲劳度控制) for Web, mini-programs, React Native and Node.js. Composable rules, pluggable storage, on-demand adapters.",
+  "type": "module",
+  "license": "MIT",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/global/index.global.js",
+  "jsdelivr": "./dist/global/index.global.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./legacy": {
+      "types": "./dist/legacy.d.ts",
+      "import": "./dist/legacy.js",
+      "require": "./dist/legacy.cjs"
+    },
+    "./adapters/memory": {
+      "types": "./dist/adapters/memory.d.ts",
+      "import": "./dist/adapters/memory.js",
+      "require": "./dist/adapters/memory.cjs"
+    },
+    "./adapters/local-storage": {
+      "types": "./dist/adapters/local-storage.d.ts",
+      "import": "./dist/adapters/local-storage.js",
+      "require": "./dist/adapters/local-storage.cjs"
+    },
+    "./adapters/session-storage": {
+      "types": "./dist/adapters/session-storage.d.ts",
+      "import": "./dist/adapters/session-storage.js",
+      "require": "./dist/adapters/session-storage.cjs"
+    },
+    "./adapters/async-storage": {
+      "types": "./dist/adapters/async-storage.d.ts",
+      "import": "./dist/adapters/async-storage.js",
+      "require": "./dist/adapters/async-storage.cjs"
+    },
+    "./adapters/weapp": {
+      "types": "./dist/adapters/weapp.d.ts",
+      "import": "./dist/adapters/weapp.js",
+      "require": "./dist/adapters/weapp.cjs"
+    },
+    "./adapters/alipay": {
+      "types": "./dist/adapters/alipay.d.ts",
+      "import": "./dist/adapters/alipay.js",
+      "require": "./dist/adapters/alipay.cjs"
+    },
+    "./adapters/node-file": {
+      "types": "./dist/adapters/node-file.d.ts",
+      "import": "./dist/adapters/node-file.js",
+      "require": "./dist/adapters/node-file.cjs"
+    },
+    "./global": "./dist/global/index.global.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check src test",
+    "format": "biome check --write src test",
+    "size": "size-limit",
+    "changeset": "changeset",
+    "prepublishOnly": "npm run build"
+  },
+  "size-limit": [
+    {
+      "name": "core",
+      "path": "dist/index.js",
+      "import": "{ createFatigue }",
+      "limit": "3.5 kB"
+    },
+    {
+      "name": "web adapter",
+      "path": "dist/adapters/local-storage.js",
+      "import": "{ localStorageAdapter }",
+      "limit": "4 kB"
+    },
+    {
+      "name": "weapp adapter",
+      "path": "dist/adapters/weapp.js",
+      "import": "{ weappAdapter }",
+      "limit": "4 kB"
+    }
+  ],
+  "keywords": [
+    "frequency-capping",
+    "fatigue",
+    "popup",
+    "toast",
+    "rate-limit",
+    "cooldown",
+    "mini-program",
+    "weapp",
+    "react-native",
+    "storage"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YOUR_ACCOUNT/fatigue-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/YOUR_ACCOUNT/fatigue-kit/issues"
+  },
+  "homepage": "https://github.com/YOUR_ACCOUNT/fatigue-kit#readme",
+  "devDependencies": {
+    "@biomejs/biome": "^2.0.0",
+    "@changesets/cli": "^2.29.0",
+    "@size-limit/preset-small-lib": "^11.2.0",
+    "size-limit": "^11.2.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  }
+}
