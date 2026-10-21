@@ -13,13 +13,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [20, 22, 24]
+        # Node 20 was dropped: the v2026 toolchain (Changesets CLI 3, vitest 5,
+        # tsup 9) requires node >= 22.12.
+        node-version: [22, 24]
         # Calendar rules must behave identically across timezones and across
         # DST transitions, so the same suite runs under several TZ settings.
         timezone: [UTC, Asia/Shanghai, America/New_York]
         exclude:
-          - node-version: 20
-            timezone: America/New_York
           - node-version: 22
             timezone: Asia/Shanghai
     runs-on: ubuntu-latest

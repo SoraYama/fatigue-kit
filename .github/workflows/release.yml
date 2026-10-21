@@ -26,17 +26,20 @@ jobs:
           cache: npm
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
-      # v2 of this action requires Changesets CLI v3; until the CLI 3 toolchain
-      # migration lands, stay on v1 (`publish:` input, CLI v2 compatible).
-      - uses: changesets/action@v1
+      # v2 of this action renamed the `publish` input to `publish-script`.
+      # `create-github-releases` and `push-git-tags` default to true, matching
+      # the previous v1 behaviour. Requires Changesets CLI v3 (installed).
+      - uses: changesets/action@v2
         with:
           # `changeset publish` (not raw `npm publish`): it compares git tags
           # and becomes a no-op when nothing is unpublished, and it creates the
           # version tags the action needs for GitHub releases.
           # The action execs this without a shell, so resolve the local bin
           # via npx (node_modules/.bin is not on PATH).
-          publish: npx --no-install changeset publish
+          publish-script: npx --no-install changeset publish
         env:
+          # Kept for @changesets/changelog-github (version step). The action
+          # itself authenticates via its `github-token` input default.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
