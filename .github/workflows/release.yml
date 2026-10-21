@@ -26,9 +26,12 @@ jobs:
           cache: npm
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
-      - uses: changesets/action@v1
+      - uses: changesets/action@v2
         with:
-          publish: npm publish
+          # `changeset publish` (not raw `npm publish`): it compares git tags
+          # and becomes a no-op when nothing is unpublished, and it creates the
+          # version tags the action needs for GitHub releases.
+          publish: changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
