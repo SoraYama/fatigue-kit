@@ -131,6 +131,8 @@
 | Lint/Format | Biome | 单工具、快 |
 | 体积 | size-limit（core ≤ 3.5 kB，adapter ≤ 4 kB） | 防膨胀 |
 | 发版 | Changesets + GitHub Actions + npm provenance | 标准 OSS 流程 |
+
+> ⚠️ Changesets 实践坑（2026-10 踩过）：① `@changesets/cli` v2.31.x 的根入口是 CLI 本体，不导出 changelog 函数，`"changelog": "@changesets/cli"`（含数组形式）必然报 "Could not resolve changelog generation functions"，要用 `@changesets/changelog-github`；② 开启 provenance 后首次发布必须 `publishConfig.access: "public"`，否则 npm 报 EUSAGE；③ 新仓库默认禁止 Actions 创建 PR，需在 Settings → Actions → Workflow permissions 打开，或用 API `PUT /repos/{owner}/{repo}/actions/permissions/workflow` 置 `can_approve_pull_request_reviews=true`。
 | 协议 | MIT，版权署名 `fatigue-kit contributors` | 见 D12 |
 
 ### D12 · 版权与合规（重要）
