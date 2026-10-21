@@ -119,6 +119,7 @@
   "homepage": "https://github.com/SoraYama/fatigue-kit#readme",
   "devDependencies": {
     "@biomejs/biome": "^2.0.0",
+    "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^2.29.0",
     "@size-limit/preset-small-lib": "^11.2.0",
     "@types/node": "26.6.5",
