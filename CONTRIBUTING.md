@@ -35,9 +35,8 @@ git commit && push  # CI runs lint + typecheck + tests + build + size
 
 Before the first publish:
 
-1. Replace `YOUR_ACCOUNT` in `package.json` (`repository`, `bugs`, `homepage`).
-2. Add a GitHub remote, push, and set the `NPM_TOKEN` secret in the repo settings.
-3. Enable GitHub Actions.
+1. Set the `NPM_TOKEN` secret in the repo settings (Settings → Secrets and variables → Actions).
+2. Enable GitHub Actions.
 
 ## Commit style
 
