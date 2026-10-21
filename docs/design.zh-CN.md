@@ -1,6 +1,6 @@
-# fatigue-kit 设计决策与迁移计划
+# fatigue-kit 设计决策与路线图
 
-> 本文是项目的完整决策记录（ADR 汇总）与迁移路线图。原组件：`@ali/txd-utils` 内约 130 行的 `fatigue.ts`，唯一调用方为 Cart 的 toast 频控。
+> 本文是项目的完整决策记录（ADR 汇总）与路线图。项目参考了一个私有遗留实现（约 130 行的 `fatigue.ts`，单规则、无测试）的**行为语义**后全新重写，用于修复其滑动窗口语义、读副作用、非原子写入与时区边界四类问题。
 
 ## 1. 定位
 
@@ -8,7 +8,7 @@
 
 - 英文语境对应 *frequency capping*，中文语境对应 *疲劳度控制*，检索量大、现成好用的库少，这是立足点。
 - **不是**服务端限流库（无分布式计数、无并发竞态保护），不是 A/B 实验 SDK。
-- 原样提取太单薄（1 个类 2 个方法、单一规则、无测试、依赖内部工具），因此采用**按新设计 cleanroom 重写**，而不是搬运旧代码。
+- 原样提取太单薄（1 个类 2 个方法、单一规则、无测试、依赖私有生态），因此采用**按新设计 cleanroom 重写**，而不是搬运旧代码。
 
 ## 2. 目标与非目标
 
@@ -137,7 +137,7 @@
 
 ### D12 · 版权与合规（重要）
 
-原代码在公司内部仓库（作者域名为内部邮箱），**不复制任何原实现、不携带内部 git 历史**。本项目为参考其公开行为语义后的全新实现；`legacy.ts` 仅保留字段名以兼容数据格式。若最终决定直接搬运旧代码，必须先走公司开源审批。仓库内不出现内部域名、registry、业务 key。
+本项目为参考某私有遗留实现的公开行为语义后的**全新实现**：不复制任何原代码、不携带任何原仓库历史；`legacy.ts` 仅保留字段名（`times` / `date` / `duration` / `todayCount`）以兼容该格式的既有数据。仓库内不出现私有域名、私有 registry 或具体业务 key。
 
 ## 5. 环境适配矩阵
 
@@ -177,14 +177,11 @@ fatigue-kit/
 └── .github/workflows/   # ci.yml（矩阵）/ release.yml（changesets）
 ```
 
-## 8. 迁移与回迁计划（六步）
+## 8. 项目状态与里程碑
 
-1. ✅ **建仓**：`~/projects/personal/fatigue-kit`，MIT，工程骨架 + 核心实现 + 全量测试（本次完成）。
-2. **补 GitHub**：替换 `package.json` 里的 `YOUR_ACCOUNT`，加 remote、推送、配置 `NPM_TOKEN` secret、开启 Actions；首个 changeset 走 `v0.1.0` 发布。
-3. **内部回迁**：`txd-utils` 的 `fatigue.ts` 改为薄兼容层——保留 `getInFatigueByKey/setFatigueByKey` 签名，内部接 `weapp`（或对应环境）adapter + `legacy` 迁移；调用方零改动。
-4. **Cart 清理**：session 分支换 `sessionStorage`/memory 规则；全局分支改 `tryConsume`，消除"先查后写"的双弹问题；顺带删掉从未传过的 `limitTimesByDay` 死参数。
-5. **灰度观察**：核心链路（营销弹窗）先开一两个业务验证迁移正确性（重点：旧疲劳记录生效、不再重复弹）。
-6. **v1.0**：API 冻结前过一轮 API review；补 `@fatigue-kit/react`（`useFatigue`）与分组预算（v2 头牌特性）。
+1. ✅ **建仓**：MIT，工程骨架 + 核心实现 + 全量测试（含时区矩阵）。
+2. ✅ **发布链路**：GitHub Actions（CI 矩阵 + changesets + provenance），`v0.2.0` 已发布到 npm。
+3. ⬜ **`v1.0`**：API 冻结前过一轮 API review（路线图见 §9）。
 
 ## 9. 路线图
 

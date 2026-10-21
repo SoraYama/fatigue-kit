@@ -114,7 +114,7 @@ AppState.addEventListener('change', (state) => {
 
 ## 迁移旧数据
 
-从内部 `{ times, date, duration, todayCount }` 存储迁移？
+从旧版 `{ times, date, duration, todayCount }` 存储迁移？
 
 ```ts
 import { migrateLegacyRecord } from 'fatigue-kit/legacy'

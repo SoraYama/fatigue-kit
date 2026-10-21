@@ -114,7 +114,7 @@ Durations accept `'45s' / '30m' / '12h' / '7d'` or milliseconds. Calendar math u
 
 ## Migrating legacy records
 
-Coming from an internal `{ times, date, duration, todayCount }` store?
+Coming from a legacy `{ times, date, duration, todayCount }` store?
 
 ```ts
 import { migrateLegacyRecord } from 'fatigue-kit/legacy'
