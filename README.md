@@ -1,6 +1,8 @@
 # fatigue-kit
 
-> Zero-dependency frequency capping (疲劳度控制) for Web, mini-programs, React Native and Node.js.
+English | [简体中文](./README.zh-CN.md)
+
+> Zero-dependency frequency capping for Web, mini-programs, React Native and Node.js.
 
 `fatigue-kit` answers one question: **should this popup / toast / guide / coupon be shown now?**
 Compose simple rules, back them by any storage, and get an atomic, testable answer — synchronously — in every JS runtime.
@@ -151,7 +153,7 @@ expect(fatigue.peek('popup', [{ max: 1, every: 'day' }]).allowed).toBe(true)
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md). Design decisions and the full plan live in [docs/design.zh-CN.md](./docs/design.zh-CN.md) (中文).
+See [CONTRIBUTING.md](./CONTRIBUTING.md). Design decisions and the full migration plan (中文): [docs/design.zh-CN.md](./docs/design.zh-CN.md).
 
 ## License
 

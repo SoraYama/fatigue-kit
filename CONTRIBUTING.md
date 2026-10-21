@@ -21,6 +21,7 @@ npm run size         # size-limit budgets
 - **Calendar/time logic** must be written with date components (`setDate`, `new Date(y, m, d)`), never `+ 24h` arithmetic — DST safety is a test requirement (CI runs the suite under several `TZ` values).
 - **Errors from storage must not crash the host app**; report via the adapter's `onError`.
 - Record format changes require a `RECORD_VERSION` bump and a migration note.
+- **Docs are bilingual**: `README.md` (English, the npm homepage) and `README.zh-CN.md` (简体中文) must stay in sync — when you change one, update the other.
 
 ## Releases
 
