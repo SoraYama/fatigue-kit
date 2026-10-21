@@ -1,5 +1,11 @@
 # fatigue-kit
 
+## 0.2.1
+
+### Patch Changes
+
+- [#6](https://github.com/SoraYama/fatigue-kit/pull/6) [`b666db6`](https://github.com/SoraYama/fatigue-kit/commit/b666db63b83613b531281fdf515323a360d78a6b) Thanks [@SoraYama](https://github.com/SoraYama)! - Toolchain refresh: TypeScript 6 (see PR notes for why not 7 yet), vitest 5, tsup 9, size-limit 14 (rolldown engine) and Changesets CLI 3 with changesets/action v2. Rebuilt output is slightly smaller (core 2.17 kB → 2.06 kB). No API changes.
+
 ## 0.2.0
 
 ### Minor Changes
