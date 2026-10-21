@@ -133,6 +133,8 @@
 | 发版 | Changesets + GitHub Actions + npm provenance | 标准 OSS 流程 |
 
 > ⚠️ Changesets 实践坑（2026-10 踩过）：① `@changesets/cli` v2.31.x 的根入口是 CLI 本体，不导出 changelog 函数，`"changelog": "@changesets/cli"`（含数组形式）必然报 "Could not resolve changelog generation functions"，要用 `@changesets/changelog-github`；② 开启 provenance 后首次发布必须 `publishConfig.access: "public"`，否则 npm 报 EUSAGE；③ 新仓库默认禁止 Actions 创建 PR，需在 Settings → Actions → Workflow permissions 打开，或用 API `PUT /repos/{owner}/{repo}/actions/permissions/workflow` 置 `can_approve_pull_request_reviews=true`。
+>
+> ⚠️ 2026-10 工具链升级（TS 6 / vitest 5 / tsup 9 / size-limit 14 / changesets 3）坑：① `changesets/action` v2 把 `publish` input **改名**为 `publish-script`，只改版本号会静默禁用发布（`create-github-releases`/`push-git-tags` 默认 true，与 v1 行为一致）；② **TypeScript 7 不可用**：它是 native-only API，tsup 9 的 rollup 管线直接 `require('typescript')` 且无 fallback（`@typescript/typescript6` fallback 只在 rollup-plugin-dts 里实现），node 22 下 dts 生成报 `parseJsonConfigFileContent is not a function`——停留 TS 6（最后一条完整 JS 编译器 API 版本线），tsup 官方支持 TS 7 后再升；③ CLI 3 / vitest 5 / tsup 9 均要求 node ≥ 22.12，CI 矩阵已去掉 node 20；④ CLI 3 × `@changesets/changelog-github` 1.0.1 兼容（v2.31 时代的坑不存在了，`changeset add → version` 全链路验证过）；⑤ 由 `GITHUB_TOKEN` 创建的 Version Packages PR，其 CI 首次为 `action_required` 状态，需 approve 该 workflow run 才会跑。
 | 协议 | MIT，版权署名 `fatigue-kit contributors` | 见 D12 |
 
 ### D12 · 版权与合规（重要）

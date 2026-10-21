@@ -8,6 +8,12 @@ updates:
     groups:
       dev-dependencies:
         dependency-type: development
+    ignore:
+      # TS 7 ships a native-only API surface; tsup's rollup pipeline does not
+      # support it yet (dts generation fails on node 22). Revisit once tsup
+      # officially supports TS 7. See docs/design.zh-CN.md D11.
+      - dependency-name: typescript
+        versions: ['>=7']
 
   - package-ecosystem: github-actions
     directory: /
