@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/@changesets/config/schema.json",
-  "changelog": ["@changesets/cli", { "repo": "SoraYama/fatigue-kit" }],
+  "changelog": ["@changesets/changelog-github", { "repo": "SoraYama/fatigue-kit" }],
   "commit": false,
   "fixed": [],
   "linked": [],
