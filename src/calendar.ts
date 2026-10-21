@@ -6,8 +6,6 @@ export interface CalendarSpec {
 	weekStartsOn: number
 }
 
-const MINUTE = 60_000
-
 /** Parse a `'HH:mm'` cutoff into minutes after local midnight. Default (no cutoff) is `0`. */
 export function parseCutoff(cutoff: string | undefined): number {
 	if (cutoff === undefined) return 0
@@ -77,15 +75,33 @@ function previousNaturalStart(naturalStart: number, spec: CalendarSpec): number 
 }
 
 /**
+ * Local wall-clock time of `cutoffMinutes` past midnight, built from date
+ * components. On DST transition days "midnight epoch + fixed minutes" would
+ * land an hour off wall-clock time (e.g. after spring-forward a 04:00 cutoff
+ * computed by addition would actually fire at 05:00), so the boundary must be
+ * constructed, never added.
+ */
+function wallClockBoundary(midnight: number, cutoffMinutes: number): number {
+	const date = new Date(midnight)
+	return new Date(
+		date.getFullYear(),
+		date.getMonth(),
+		date.getDate(),
+		Math.floor(cutoffMinutes / 60),
+		cutoffMinutes % 60,
+	).getTime()
+}
+
+/**
  * Start of the calendar period containing `ts`, cutoff applied.
  * All arithmetic works on local date components (never `+ 24h`), so DST
  * transitions cannot shift a boundary.
  */
 export function calendarPeriodStart(ts: number, spec: CalendarSpec): number {
 	const natural = naturalPeriodStart(ts, spec)
-	const boundary = natural + spec.cutoffMinutes * MINUTE
+	const boundary = wallClockBoundary(natural, spec.cutoffMinutes)
 	if (boundary <= ts) return boundary
-	return previousNaturalStart(natural, spec) + spec.cutoffMinutes * MINUTE
+	return wallClockBoundary(previousNaturalStart(natural, spec), spec.cutoffMinutes)
 }
 
 // Per-step cursors used to find the *next* boundary. Each jump is guaranteed to

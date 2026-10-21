@@ -37,6 +37,12 @@ describe('calendarPeriodStart', () => {
 		expect(calendarPeriodStart(at(2026, 2, 8, 23, 0), spec)).toBe(at(2026, 2, 8, 4, 0))
 	})
 
+	it('uses wall-clock boundaries on DST transition days (2026-03-08 springs forward in some zones)', () => {
+		const spec = { every: 'day' as const, cutoffMinutes: parseCutoff('04:00'), weekStartsOn: 1 }
+		const ts = at(2026, 2, 8, 4, 0)
+		expect(calendarPeriodStart(ts, spec)).toBe(ts)
+	})
+
 	it('computes weeks with a configurable first day', () => {
 		// 2026-10-14 is a Wednesday.
 		const mondayFirst = { every: 'week' as const, cutoffMinutes: 0, weekStartsOn: 1 }
