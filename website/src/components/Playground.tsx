@@ -26,6 +26,7 @@ const copy = {
 export default function Playground({ locale = 'en', compact = false }: Props) {
   const text = copy[locale]
   const [configuration, setConfiguration] = useState(initialConfiguration)
+  const [ready, setReady] = useState(false)
   const [copied, setCopied] = useState(false)
   const [recordText, setRecordText] = useState('null')
   const [recordError, setRecordError] = useState('')
@@ -40,9 +41,12 @@ export default function Playground({ locale = 'en', compact = false }: Props) {
     setConfiguration(loaded)
     if (loaded.record !== null) fatigue.importRecord(loaded.key, loaded.record)
     setRecordText(JSON.stringify(loaded.record, null, 2))
+    setReady(true)
   }, [fatigue])
 
-  useEffect(() => setResult(fatigue.peek(configuration.key, rules)), [fatigue, configuration, rules])
+  useEffect(() => {
+    if (ready) setResult(fatigue.peek(configuration.key, rules))
+  }, [fatigue, configuration, ready, rules])
 
   function update<K extends keyof PlaygroundConfiguration>(field: K, value: PlaygroundConfiguration[K]) {
     setConfiguration((current) => ({ ...current, [field]: value }))
@@ -73,6 +77,7 @@ export default function Playground({ locale = 'en', compact = false }: Props) {
   }
 
   async function share() {
+    if (!ready) return
     const url = new URL(window.location.href)
     url.searchParams.set('config', encodeConfiguration({ ...configuration, record: fatigue.exportRecord(configuration.key) }))
     await navigator.clipboard.writeText(url.toString())
