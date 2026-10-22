@@ -24,6 +24,7 @@ test('switches locale to Simplified Chinese', async ({ page, isMobile }) => {
 test('operates and restores a shared playground configuration', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write'])
   await page.goto('playground/')
+  await expect(page.locator('.playground')).toHaveAttribute('data-ready', 'true')
   await expect(page.getByLabel('Lifetime limit')).not.toBeChecked()
   await page.getByLabel('Lifetime limit').click()
   await expect(page.getByLabel('Lifetime limit')).toBeChecked()
@@ -33,6 +34,7 @@ test('operates and restores a shared playground configuration', async ({ page, c
   const link = await page.evaluate(() => navigator.clipboard.readText())
   expect(link).toContain('config=')
   await page.goto(link)
+  await expect(page.locator('.playground')).toHaveAttribute('data-ready', 'true')
   await expect(page.getByLabel('Lifetime limit')).toBeChecked()
 })
 

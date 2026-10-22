@@ -91,7 +91,7 @@ export default function Playground({ locale = 'en', compact = false }: Props) {
     update(field, event.currentTarget.checked as never)
 
   return (
-    <section className={`playground ${compact ? 'playground--compact' : ''}`}>
+    <section className={`playground ${compact ? 'playground--compact' : ''}`} data-ready={ready}>
       <header><p className="playground__status" aria-live="polite">{result.allowed ? text.allowed : text.denied}</p><h2>{text.title}</h2><p>{text.intro}</p></header>
       {!compact && <div className="playground__builder">
         <fieldset><legend>{text.rules}</legend>
