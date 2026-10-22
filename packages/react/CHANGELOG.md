@@ -1,5 +1,11 @@
 # fatigue-kit-react
 
+## 1.0.1
+
+### Patch Changes
+
+- [#12](https://github.com/SoraYama/fatigue-kit/pull/12) [`b665772`](https://github.com/SoraYama/fatigue-kit/commit/b6657728d0b7b6b71d6088825d628bb997a01875) Thanks [@SoraYama](https://github.com/SoraYama)! - Publish the React bindings under the available `fatigue-kit-react` npm package name after npm rejected the unavailable scoped package.
+
 ## 1.0.0
 
 ### Major Changes
