@@ -1,5 +1,5 @@
 {
-  "name": "@fatigue-kit/react",
+  "name": "fatigue-kit-react",
   "version": "1.0.0",
   "description": "React bindings for fatigue-kit frequency capping.",
   "type": "module",

@@ -52,7 +52,7 @@ try {
 import { createElement } from 'react'
 import { renderToString } from 'react-dom/server'
 import { createFatigue } from 'fatigue-kit'
-import { FatigueProvider } from '@fatigue-kit/react'
+import { FatigueProvider } from 'fatigue-kit-react'
 assert.match(renderToString(createElement(FatigueProvider, { value: createFatigue() }, createElement('span', null, 'ok'))), /ok/)
 `,
 	)

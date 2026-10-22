@@ -1,4 +1,4 @@
-# @fatigue-kit/react
+# fatigue-kit-react
 
 ## 1.0.0
 

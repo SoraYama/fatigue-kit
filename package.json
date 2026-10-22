@@ -84,9 +84,9 @@
     "size": "size-limit",
     "smoke:package": "node smoke/run.mjs",
     "smoke:react": "node smoke/react.mjs",
-    "test:react": "npm test --workspace @fatigue-kit/react",
-    "build:react": "npm run build --workspace @fatigue-kit/react",
-    "typecheck:react": "npm run typecheck --workspace @fatigue-kit/react",
+    "test:react": "npm test --workspace fatigue-kit-react",
+    "build:react": "npm run build --workspace fatigue-kit-react",
+    "typecheck:react": "npm run typecheck --workspace fatigue-kit-react",
     "build:website": "npm run build --workspace @fatigue-kit/website",
     "changeset": "changeset",
     "prepublishOnly": "npm run build"
