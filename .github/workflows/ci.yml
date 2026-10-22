@@ -35,6 +35,8 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test
+      - run: npm run test:coverage
+        if: matrix.node-version == 22 && matrix.timezone == 'UTC'
       - run: npm run build
       - run: npm run size
         if: matrix.node-version == 22 && matrix.timezone == 'UTC'
