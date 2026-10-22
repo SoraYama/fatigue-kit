@@ -1,5 +1,9 @@
 # fatigue-kit
 
+[![CI](https://github.com/SoraYama/fatigue-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/SoraYama/fatigue-kit/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/fatigue-kit)](https://www.npmjs.com/package/fatigue-kit)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
 English | [简体中文](./README.zh-CN.md)
 
 > Zero-dependency frequency capping for Web, mini-programs, React Native and Node.js.
@@ -87,14 +91,14 @@ Enable **构建 npm** in the devtools, then `require('fatigue-kit/adapters/weapp
 
 | Option | Default | Description |
 | --- | --- | --- |
-| `storage` | `memoryAdapter()` | Any `SyncStorage` |
+| `storage` | `memoryAdapter()` | Any `SyncStorage`. Built-in adapters report storage failures via `onError` instead of throwing; wrap your own implementation in try/catch if it can throw |
 | `clock` | system time | `{ now(): number }`, inject in tests |
 | `namespace` | `'fatigue-kit'` | Prefix for storage keys |
 | `maxHits` | `100` | Hits kept per record; older ones are pruned |
 
 ### Methods
 
-- `tryConsume(key, rules)` — atomically check and consume. Returns `{ allowed, remaining, nextAvailableAt?, deniedBy? }`. `remaining` describes the state **after** the call: `remaining === 0` means "that was the last allowed consumption". `peek` reports the current state.
+- `tryConsume(key, rules)` — atomically check and consume. Returns `{ allowed, remaining, nextAvailableAt?, deniedBy? }`. `remaining` describes the state **after** the call: `remaining === 0` means "that was the last allowed consumption". `peek` reports the current state. Two details: `remaining` is `Infinity` when no count-based rule applies (e.g. cooldown-only) — beware when JSON-serializing — and `deniedBy` is the *same rule object* you passed in, so you can match it with `===`.
 - `peek(key, rules)` — same result, without consuming.
 - `reset(key?)` — forget one key, or all keys (needs `storage.keys()`).
 - `exportRecord(key)` / `importRecord(key, record)` — inspect and seed records (migrations, debugging).

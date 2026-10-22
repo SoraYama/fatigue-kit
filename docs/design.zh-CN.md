@@ -183,7 +183,14 @@ fatigue-kit/
 
 1. ✅ **建仓**：MIT，工程骨架 + 核心实现 + 全量测试（含时区矩阵）。
 2. ✅ **发布链路**：GitHub Actions（CI 矩阵 + changesets + provenance），`v0.2.0` 已发布到 npm。
-3. ⬜ **`v1.0`**：API 冻结前过一轮 API review（路线图见 §9）。
+3. ✅ **v1.0 API review（2026-10-22）**：结论 = **API 面冻结，无需破坏性变更**。审查记录：
+   - 核心五方法（`tryConsume` / `peek` / `reset` / `exportRecord` / `importRecord`）+ 四类规则 + `ConsumeResult` 语义自洽；`remaining` 的"消费后"语义与 `deniedBy` 的引用恒等（可 `===` 匹配）已文档化
+   - 7 个内置 adapter 异常策略一致：所有操作 catch → `onError`，绝不抛出（web 家族 / weapp / alipay / node-file / async-storage 逐一核过）；自定义 `SyncStorage` 的异常责任已在 README 说明
+   - `remaining` 为 `Infinity` 的场景（仅 cooldown 等无计数规则）已文档化（JSON 序列化注意）
+   - 类型导出面完整：主入口导出核心类型，子路径导出各自 adapter 类型
+   - IIFE global 包等价主入口（`createFatigue` / `memoryAdapter` / `RECORD_VERSION`），`legacy` 不在其中——CDN + 旧数据迁移属低频组合，走 bundler 子路径即可
+   - 记录在案的非目标：规则编译缓存（每次调用重新解析 `'7d'` 等字符串，开销极小；若 v1.x 出现真实性能诉求再考虑 WeakMap 按 hoisted 规则数组缓存）、`every: 'hour'`（滑窗 `{ max, window: '1h' }` 已覆盖）
+4. ⬜ **`v1.0`**：发布 1.0.0（API 冻结声明 + coverage 进 CI + README badges）。
 
 ## 9. 路线图
 

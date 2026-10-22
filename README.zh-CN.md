@@ -2,6 +2,10 @@
 
 [English](./README.md) | 简体中文
 
+[![CI](https://github.com/SoraYama/fatigue-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/SoraYama/fatigue-kit/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/fatigue-kit)](https://www.npmjs.com/package/fatigue-kit)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
 > 零依赖的前端频控（疲劳度控制）库，覆盖 Web、小程序、React Native 和 Node.js。
 
 `fatigue-kit` 只回答一个问题：**这个弹窗 / toast / 引导 / 优惠，现在能不能出？**
@@ -87,14 +91,14 @@ AppState.addEventListener('change', (state) => {
 
 | 选项 | 默认值 | 说明 |
 | --- | --- | --- |
-| `storage` | `memoryAdapter()` | 任意 `SyncStorage` 实现 |
+| `storage` | `memoryAdapter()` | 任意 `SyncStorage` 实现。内置 adapter 出错时经 `onError` 上报而不抛出；自定义实现若可能抛错请自行 try/catch |
 | `clock` | 系统时间 | `{ now(): number }`，测试时注入 |
 | `namespace` | `'fatigue-kit'` | 存储 key 前缀 |
 | `maxHits` | `100` | 每条记录保留的最大命中数，更旧的会被修剪 |
 
 ### 方法
 
-- `tryConsume(key, rules)` —— 原子地检查并消费。返回 `{ allowed, remaining, nextAvailableAt?, deniedBy? }`。`remaining` 描述**本次调用之后**的状态：`remaining === 0` 表示"刚才是最后一次"；`peek` 返回当前状态。
+- `tryConsume(key, rules)` —— 原子地检查并消费。返回 `{ allowed, remaining, nextAvailableAt?, deniedBy? }`。`remaining` 描述**本次调用之后**的状态：`remaining === 0` 表示"刚才是最后一次"；`peek` 返回当前状态。两个细节：无计数类规则时（如仅 cooldown）`remaining` 为 `Infinity`（JSON 序列化时注意）；`deniedBy` 是你**传入的同一规则对象**，可直接用 `===` 匹配。
 - `peek(key, rules)` —— 结果相同，但不消费。
 - `reset(key?)` —— 清除一个 key，或不传参数清除全部（需要 `storage.keys()`）。
 - `exportRecord(key)` / `importRecord(key, record)` —— 读取与灌入记录（迁移、调试用）。
