@@ -1,4 +1,4 @@
-> **Last updated**: 2026-10-22 (fixed Starlight default-locale sidebar paths and added generated-link validation)
+> **Last updated**: 2026-10-22 (completed v1.x docs, playground, React matrix, E2E, accessibility and Lighthouse gates)
 
 # Agent Knowledge Index
 
@@ -12,6 +12,7 @@
 
 | Note | Summary |
 | --- | --- |
+| [2026-10-22-v1x-completion](feature/2026-10-22-v1x-completion.md) | v1.x Definition of Done: 40+40 bilingual docs, complete versioned playground, packed React 18/19 consumers, Playwright desktop/mobile, axe accessibility and Lighthouse thresholds |
 | [2026-10-22-v1x-website-react](feature/2026-10-22-v1x-website-react.md) | Astro/Starlight English-first bilingual GitHub Pages website and real-engine playground; fatigue-kit-react uses explicit actions and useSyncExternalStore for Strict Mode-safe, SSR-safe key subscriptions |
 
 ## Bug Fixes
