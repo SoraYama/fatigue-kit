@@ -1,5 +1,11 @@
 # fatigue-kit
 
+## 1.0.1
+
+### Patch Changes
+
+- [#10](https://github.com/SoraYama/fatigue-kit/pull/10) [`79759ad`](https://github.com/SoraYama/fatigue-kit/commit/79759ade66658684db6b36d28b7c3727d7018979) Thanks [@SoraYama](https://github.com/SoraYama)! - Re-export `WebStorageAdapterOptions` from the local-storage and session-storage public subpaths so TypeScript consumers do not depend on a private generated declaration chunk.
+
 ## 1.0.0
 
 ### Major Changes
