@@ -135,7 +135,7 @@ if (migrated) {
 ## 测试你的规则
 
 ```ts
-import { createFatigue } from 'fatigue-kit'
+import { createFatigue, memoryAdapter } from 'fatigue-kit'
 const clock = { current: 0, now: () => clock.current }
 const fatigue = createFatigue({ storage: memoryAdapter(), clock })
 fatigue.tryConsume('popup', [{ max: 1, every: 'day' }])
@@ -151,9 +151,13 @@ expect(fatigue.peek('popup', [{ max: 1, every: 'day' }]).allowed).toBe(true)
 
 ## 路线图
 
-- `@fatigue-kit/react` —— `useFatigue()` Hook 绑定
-- 分组预算 —— "所有营销弹窗合计每天最多 3 个"，带优先级仲裁
-- 跨 tab 一致性、IANA 时区支持、调试面板
+路线图表达方向，而非承诺发布日期。
+
+- **Now — v1.x 产品化：**发布包测试、英语优先且中英完整对齐的文档、GitHub Pages 官网、Changelog、Roadmap 与可分享 Playground。
+- **Next — React：**以 TDD 完成 bindings，覆盖 React 18/19、Strict Mode、SSR 与 hydration。
+- **Exploring：**跨 tab 状态协调（最终一致）、IANA 时区、explain/debug API 与异步原子消费。
+- **Later — v2 候选：**共享预算、优先级仲裁、互斥与可视化调试工具。
+- **Not planned：**服务端分布式限流、A/B 实验平台或远程策略管理。
 
 ## 参与贡献
 

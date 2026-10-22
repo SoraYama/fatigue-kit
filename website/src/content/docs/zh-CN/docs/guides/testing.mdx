@@ -1,0 +1,16 @@
+---
+title: 测试规则
+description: 使用可注入时钟冻结并推进时间。
+---
+
+注入时钟，让时间完全确定：
+
+```ts
+import { createFatigue, memoryAdapter } from 'fatigue-kit'
+const clock = { current: 0, now: () => clock.current }
+const fatigue = createFatigue({ storage: memoryAdapter(), clock })
+fatigue.tryConsume('popup', [{ max: 1, every: 'day' }])
+clock.current += 24 * 60 * 60 * 1000
+```
+
+测试日历规则时，优先使用本地日期分量构造预期时间。库不使用 `+ 24h` 进行日历运算，因此夏令时切换不会移动边界。

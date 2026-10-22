@@ -159,7 +159,7 @@
 - 持久化/隔离：跨实例共享、namespace 隔离、坏数据、版本前向兼容、修剪与 lifetime 存活。
 - adapter 契约：每个内置 adapter 过一遍引擎集成（写入前缀、keys、异常降级、RN 预载/flush/索引、支付宝 data 包裹、文件落盘）。
 - legacy：格式转换 + "迁移后疲劳仍在" 集成。
-- CI：node 20/22/24 × TZ 矩阵 + typecheck + lint + build + size。
+- CI：Node.js 22/24 × TZ 矩阵 + typecheck + lint + coverage + build + size；另对 npm tarball 运行 ESM、CJS、类型、子路径与 IIFE smoke tests。
 
 ## 7. 目录结构
 
@@ -190,14 +190,18 @@ fatigue-kit/
    - 类型导出面完整：主入口导出核心类型，子路径导出各自 adapter 类型
    - IIFE global 包等价主入口（`createFatigue` / `memoryAdapter` / `RECORD_VERSION`），`legacy` 不在其中——CDN + 旧数据迁移属低频组合，走 bundler 子路径即可
    - 记录在案的非目标：规则编译缓存（每次调用重新解析 `'7d'` 等字符串，开销极小；若 v1.x 出现真实性能诉求再考虑 WeakMap 按 hoisted 规则数组缓存）、`every: 'hour'`（滑窗 `{ max, window: '1h' }` 已覆盖）
-4. ⬜ **`v1.0`**：发布 1.0.0（API 冻结声明 + coverage 进 CI + README badges）。
+4. ✅ **`v1.0`（2026-10-22）**：1.0.0 已发布到 npm 与 GitHub Releases；API 冻结声明、coverage CI 和 README badges 均已落地。
+5. 🚧 **`v1.x`**：先完成发布包测试、英语优先的双语文档、GitHub Pages 官网（首页、文档、Changelog、Roadmap、Playground），再以 TDD 完成 React bindings。
 
 ## 9. 路线图
 
-- **v0.x**：稳定核心 + adapter；收集真实业务规则诉求。
-- **v1.0**：API 冻结；文档站（可用 README 起步）；badge/覆盖率。
-- **v1.x**：`@fatigue-kit/react`；跨 tab 一致（BroadcastChannel/storage event）；IANA 时区。
-- **v2**：分组/全局预算 + 优先级仲裁（营销弹窗互斥类需求的正解，差异化卖点）；调试面板（导出全部记录可视化）。
+路线图表达方向而非发布日期承诺。
+
+- **Now — v1.x 产品化**：npm tarball 消费测试与覆盖率门禁；英语为 canonical、简体中文完整对齐的文档体系；基于 Astro/Starlight 的 GitHub Pages 官网；首页、文档、Changelog、Roadmap 与可分享 Playground。
+- **Next — v1.x React 生态**：以严格 TDD 完成 `@fatigue-kit/react`，覆盖 React 18/19、Strict Mode、SSR、hydration 与发布包测试；官网交互示例使用 bindings 自测。
+- **Exploring**：跨 tab 状态协调（目标先定义为传播与最终一致，不承诺同步强原子性）；IANA 时区；逐规则 explain/debug API；异步原子消费的可行性。
+- **Later — v2 候选**：分组/全局预算、优先级仲裁、互斥与候选选择、可视化调试工具。冻结 v2 API 前至少收集 2～3 个真实业务案例。
+- **Not planned**：服务端分布式限流、A/B 实验平台、远程策略管理平台。
 
 ## 10. 已知限制
 

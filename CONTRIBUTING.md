@@ -12,6 +12,7 @@ npm run typecheck    # tsc --noEmit
 npm run lint         # biome check
 npm run format       # biome check --write
 npm run size         # size-limit budgets
+npm run smoke:package # test the packed npm artifact as ESM/CJS/TypeScript/IIFE
 ```
 
 ## Ground rules

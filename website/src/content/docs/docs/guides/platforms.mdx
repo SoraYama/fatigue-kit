@@ -1,0 +1,16 @@
+---
+title: Choose an adapter
+description: Storage adapters for Web, React Native, mini-programs and Node.js.
+---
+
+| Runtime | Import |
+| --- | --- |
+| Persistent Web | `fatigue-kit/adapters/local-storage` |
+| Per-tab Web | `fatigue-kit/adapters/session-storage` |
+| React Native | `fatigue-kit/adapters/async-storage` |
+| WeChat | `fatigue-kit/adapters/weapp` |
+| Alipay | `fatigue-kit/adapters/alipay` |
+| Node.js | `fatigue-kit/adapters/node-file` |
+| Tests / SSR | `memoryAdapter` from `fatigue-kit` |
+
+The core consumes the synchronous `SyncStorage` contract. The React Native adapter hydrates an in-memory cache through `ready` and writes back asynchronously; call `flush()` when the app enters the background.

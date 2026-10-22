@@ -1,0 +1,24 @@
+---
+title: React bindings
+description: Provider and hooks for React 18 and 19.
+---
+
+```sh
+npm install fatigue-kit @fatigue-kit/react
+```
+
+```tsx
+import { createFatigue } from 'fatigue-kit'
+import { FatigueProvider, useFatigueState } from '@fatigue-kit/react'
+
+const fatigue = createFatigue()
+
+function Coupon() {
+  const popup = useFatigueState('coupon', [{ max: 1, every: 'day' }])
+  return <button onClick={() => popup.tryConsume()}>Open coupon</button>
+}
+
+<FatigueProvider value={fatigue}><Coupon /></FatigueProvider>
+```
+
+Consumption is explicit. The hooks never consume during render or mount, which keeps Strict Mode and SSR predictable. Operations performed through `useFatigueState` notify same-key subscribers; direct writes through the raw core instance are not observed automatically.

@@ -1,0 +1,35 @@
+---
+title: Core API
+description: createFatigue and the Fatigue instance methods.
+---
+
+## `createFatigue(options?)`
+
+Options include `storage`, `clock`, `namespace`, and `maxHits`.
+
+## `tryConsume(key, rules)`
+
+Checks every rule and records one hit when allowed. Returns `ConsumeResult`.
+
+## `peek(key, rules)`
+
+Returns the same result shape without changing the record.
+
+## `reset(key?)`
+
+Removes one record. Without a key, it removes records visible through `storage.keys()`.
+
+## `exportRecord(key)` / `importRecord(key, record)`
+
+Read or overwrite a versioned record for migration and debugging.
+
+## `ConsumeResult`
+
+```ts
+interface ConsumeResult {
+  allowed: boolean
+  remaining: number
+  nextAvailableAt?: number
+  deniedBy?: FatigueRule
+}
+```

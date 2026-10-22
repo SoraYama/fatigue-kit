@@ -1,0 +1,24 @@
+---
+title: 介绍
+description: 面向每个 JavaScript 运行时的疲劳度控制。
+---
+
+`fatigue-kit` 回答一个问题：**这个弹窗、toast、引导或优惠现在能不能展示？**
+
+它通过一个同步 API 组合日历周期、滑动窗口、冷却时间与终身上限。核心零运行时依赖，覆盖 Web、小程序、React Native 与 Node.js。
+
+## 为什么需要它
+
+频控规则很容易散落成日期比较和存储写入。`fatigue-kit` 让策略保持显式、可测试、可移植，并在单个 JavaScript 上下文内原子地完成检查与消费。
+
+```ts
+import { createFatigue } from 'fatigue-kit'
+const fatigue = createFatigue()
+const result = fatigue.tryConsume('coupon-popup', [
+  { max: 1, every: 'day' },
+  { max: 3, window: '7d' },
+  { cooldown: '4h' },
+])
+```
+
+继续阅读[快速开始](./quick-start/)或打开[演练场](/fatigue-kit/zh-cn/playground/)。

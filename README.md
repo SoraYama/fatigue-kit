@@ -135,7 +135,7 @@ if (migrated) {
 ## Testing your rules
 
 ```ts
-import { createFatigue } from 'fatigue-kit'
+import { createFatigue, memoryAdapter } from 'fatigue-kit'
 const clock = { current: 0, now: () => clock.current }
 const fatigue = createFatigue({ storage: memoryAdapter(), clock })
 fatigue.tryConsume('popup', [{ max: 1, every: 'day' }])
@@ -151,9 +151,13 @@ expect(fatigue.peek('popup', [{ max: 1, every: 'day' }]).allowed).toBe(true)
 
 ## Roadmap
 
-- `@fatigue-kit/react` — `useFatigue()` hook bindings
-- Group budgets — "all marketing popups together, max 3 per day", with priorities
-- Cross-tab consistency, IANA timezone support, debug inspector
+The roadmap describes direction, not promised release dates.
+
+- **Now — v1.x productization:** packed-package tests, English-first bilingual documentation, a GitHub Pages website, changelog, roadmap and shareable playground.
+- **Next — React:** TDD-built bindings covering React 18/19, Strict Mode, SSR and hydration.
+- **Exploring:** cross-tab coordination (eventual consistency), IANA timezones, explain/debug APIs and asynchronous atomic consumption.
+- **Later — v2 candidates:** shared budgets, priority arbitration, mutual exclusion and visual debugging tools.
+- **Not planned:** distributed server-side rate limiting, an A/B testing platform or remote policy management.
 
 ## Contributing
 

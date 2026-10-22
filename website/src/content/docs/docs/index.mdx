@@ -1,0 +1,25 @@
+---
+title: Introduction
+description: Frequency capping for every JavaScript runtime.
+---
+
+`fatigue-kit` answers one question: **may this popup, toast, guide or offer appear now?**
+
+It combines calendar limits, sliding windows, cooldowns and lifetime caps through one synchronous API. The core has zero runtime dependencies and works across Web, mini-programs, React Native and Node.js.
+
+## Why it exists
+
+Frequency rules often become scattered date comparisons and storage writes. `fatigue-kit` keeps the policy explicit, testable and portable while making the check-and-consume step atomic within one JavaScript context.
+
+```ts
+import { createFatigue } from 'fatigue-kit'
+
+const fatigue = createFatigue()
+const result = fatigue.tryConsume('coupon-popup', [
+  { max: 1, every: 'day' },
+  { max: 3, window: '7d' },
+  { cooldown: '4h' },
+])
+```
+
+Continue with the [quick start](./quick-start/) or experiment in the [playground](/fatigue-kit/playground/).

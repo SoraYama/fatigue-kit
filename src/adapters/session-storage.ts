@@ -1,6 +1,8 @@
 import type { SyncStorage } from '../types'
 import { globalStorage, type WebStorageAdapterOptions, webStorageAdapter } from './web'
 
+export type { WebStorageAdapterOptions } from './web'
+
 function requireSessionStorage(): Storage {
 	const storage = globalStorage('sessionStorage')
 	if (storage === undefined) {

@@ -1,0 +1,12 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro'
+const groups = [
+  ['Now', 'Package tests, bilingual documentation, website, playground and React bindings.'],
+  ['Exploring', 'Cross-tab coordination, IANA timezones, explain APIs and asynchronous atomic consumption.'],
+  ['Later', 'Shared budgets, priority arbitration, mutual exclusion and visual debugging tools.'],
+  ['Not planned', 'Distributed server rate limiting, A/B experimentation or remote policy management.'],
+]
+---
+<SiteLayout title="Roadmap — fatigue-kit" description="The public direction for fatigue-kit.">
+  <section class="home-section"><h1>Roadmap</h1><p>Direction, not promised release dates.</p><div class="feature-grid">{groups.map(([title, body]) => <article><h2>{title}</h2><p>{body}</p></article>)}</div></section>
+</SiteLayout>
