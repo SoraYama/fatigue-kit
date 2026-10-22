@@ -27,7 +27,11 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run build:react
+      - run: npm test --workspace @fatigue-kit/website
       - run: npm run build:website
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e --workspace @fatigue-kit/website
+      - run: npm run lighthouse --workspace @fatigue-kit/website
       - uses: actions/upload-pages-artifact@v4
         if: github.event_name != 'pull_request'
         with:
