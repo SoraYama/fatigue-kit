@@ -9,6 +9,8 @@ const root = resolve(import.meta.dirname, '..')
 const directory = mkdtempSync(join(tmpdir(), `fatigue-kit-react-${version}-`))
 
 try {
+	run('npm', ['run', 'build'], root)
+	run('npm', ['run', 'build:react'], root)
 	writeFileSync(join(directory, 'package.json'), JSON.stringify({ private: true, type: 'module' }))
 	const corePack = pack(root)
 	const reactPack = pack(join(root, 'packages/react'))

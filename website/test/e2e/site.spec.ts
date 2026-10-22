@@ -24,7 +24,9 @@ test('switches locale to Simplified Chinese', async ({ page, isMobile }) => {
 test('operates and restores a shared playground configuration', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write'])
   await page.goto('playground/')
-  await page.getByLabel('Lifetime limit').check()
+  await expect(page.getByLabel('Lifetime limit')).not.toBeChecked()
+  await page.getByLabel('Lifetime limit').click()
+  await expect(page.getByLabel('Lifetime limit')).toBeChecked()
   await page.getByRole('button', { name: 'Try consume' }).click()
   await expect(page.getByText('Denied', { exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Copy share link' }).click()
