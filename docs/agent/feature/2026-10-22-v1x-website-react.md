@@ -1,4 +1,4 @@
-> **Date / Revised**: 2026-10-22 (created and revised)
+> **Date / Revised**: 2026-10-22 (created) / 2026-10-22 (revised)
 
 # v1.x website and React bindings
 
@@ -24,6 +24,6 @@ The React package owns a key-scoped external store and uses `useSyncExternalStor
 
 Do not hide frequency consumption in a mount effect. Explicit user actions make behavior predictable under Strict Mode, SSR, remounts, and future concurrent React features. A bindings-owned external store preserves the frozen core API, but direct operations through the raw core instance are intentionally outside React notification guarantees.
 
-For Starlight, locale content paths determine generated URLs and are normalized to lowercase. GitHub Pages links must consistently include the configured base path. Website dependencies remain private and must never enter the core tarball.
+For Starlight, locale content paths determine generated URLs and are normalized to lowercase. The unprefixed canonical language must use `locales.root`; configuring it as `en` causes navigation to invent an `/en/` prefix even when output is generated at root. GitHub Pages links must consistently include the configured base path, and generated internal links are validated against `dist/`. Website dependencies remain private and must never enter the core tarball.
 
 The intended scoped package name could not be published because the npm `@fatigue-kit` scope does not exist for the release token (`E404 Scope not found`). The public package was therefore renamed to the available unscoped `fatigue-kit-react`; keep documentation, smoke tests, workspace scripts, and changelog names aligned with this package identity.

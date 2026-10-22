@@ -1,4 +1,4 @@
-> **Last updated**: 2026-10-22 (added the bilingual website, playground, Pages deployment and React bindings)
+> **Last updated**: 2026-10-22 (fixed Starlight default-locale sidebar paths and added generated-link validation)
 
 # Agent Knowledge Index
 
@@ -18,6 +18,7 @@
 
 | Note | Summary |
 | --- | --- |
+| [2026-10-22-starlight-sidebar-base-path](bugfix/2026-10-22-starlight-sidebar-base-path.md) | Starlight defaultLocale `en` generated `/fatigue-kit/en/...` sidebar links while static output lived at `/fatigue-kit/...`; use `locales.root` and verify every generated internal href against `dist/` |
 
 ## Optimizations
 
