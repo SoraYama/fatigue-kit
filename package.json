@@ -74,9 +74,10 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "lint": "biome check src test",
-    "format": "biome check --write src test",
+    "lint": "biome check src test smoke",
+    "format": "biome check --write src test smoke",
     "size": "size-limit",
+    "smoke:package": "node smoke/run.mjs",
     "changeset": "changeset",
     "prepublishOnly": "npm run build"
   },

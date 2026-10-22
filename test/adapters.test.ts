@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -71,6 +71,18 @@ function fakeAlipayClient() {
 			map.delete(key)
 		},
 		getStorageInfoSync: () => ({ keys: [...map.keys()] }),
+	}
+}
+
+function throwingClient(message: string) {
+	const fail = () => {
+		throw new Error(message)
+	}
+	return {
+		getStorageSync: fail,
+		setStorageSync: fail,
+		removeStorageSync: fail,
+		getStorageInfoSync: fail,
 	}
 }
 
@@ -197,6 +209,30 @@ describe('asyncStorageAdapter', () => {
 		await expect(handle.ready).resolves.toBeUndefined()
 		expect(handle.storage.get('anything')).toBeNull()
 	})
+
+	it('reports backend failures during hydration and flush', async () => {
+		const errors: unknown[] = []
+		const client = {
+			getItem: async () => {
+				throw new Error('read failed')
+			},
+			setItem: async () => {
+				throw new Error('write failed')
+			},
+			removeItem: async () => {
+				throw new Error('remove failed')
+			},
+		}
+		const handle = asyncStorageAdapter(client, {
+			flushDelay: 60_000,
+			onError: (error) => errors.push(error),
+		})
+		await handle.ready
+		handle.storage.set('fatigue-kit:a', 'value')
+		handle.storage.remove('fatigue-kit:a')
+		await expect(handle.flush()).resolves.toBeUndefined()
+		expect(errors).toHaveLength(3)
+	})
 })
 
 describe('weappAdapter', () => {
@@ -209,6 +245,19 @@ describe('weappAdapter', () => {
 		expect(fatigue.tryConsume('k', rules).allowed).toBe(false)
 		const keys = weappAdapter({ client }).keys?.() ?? []
 		expect(keys).toContain('fatigue-kit:k')
+	})
+
+	it('reports every client failure without throwing', () => {
+		const errors: unknown[] = []
+		const storage = weappAdapter({
+			client: throwingClient('wx failure'),
+			onError: (error) => errors.push(error),
+		})
+		expect(storage.get('k')).toBeNull()
+		expect(() => storage.set('k', 'v')).not.toThrow()
+		expect(() => storage.remove('k')).not.toThrow()
+		expect(storage.keys?.()).toEqual([])
+		expect(errors).toHaveLength(4)
 	})
 
 	it('requires the wx global or an injected client', () => {
@@ -224,6 +273,23 @@ describe('alipayAdapter', () => {
 		expect(fatigue.tryConsume('k', rules).allowed).toBe(true)
 		expect(client.map.get('fatigue-kit:k')).not.toBeUndefined()
 		expect(fatigue.tryConsume('k', rules).allowed).toBe(false)
+		const storage = alipayAdapter({ client })
+		expect(storage.keys?.()).toContain('fatigue-kit:k')
+		storage.remove('fatigue-kit:k')
+		expect(storage.get('fatigue-kit:k')).toBeNull()
+	})
+
+	it('reports every client failure without throwing', () => {
+		const errors: unknown[] = []
+		const storage = alipayAdapter({
+			client: throwingClient('my failure'),
+			onError: (error) => errors.push(error),
+		})
+		expect(storage.get('k')).toBeNull()
+		expect(() => storage.set('k', 'v')).not.toThrow()
+		expect(() => storage.remove('k')).not.toThrow()
+		expect(storage.keys?.()).toEqual([])
+		expect(errors).toHaveLength(4)
 	})
 
 	it('requires the my global or an injected client', () => {
@@ -242,8 +308,23 @@ describe('fileAdapter', () => {
 
 			// A fresh instance reads from disk, not from any cache.
 			expect(fileAdapter(file).get('a')).toBe('1')
+			expect(storage.keys?.()).toEqual(['a'])
 			storage.remove('a')
 			expect(fileAdapter(file).get('a')).toBeNull()
+		} finally {
+			rmSync(dir, { recursive: true, force: true })
+		}
+	})
+
+	it('recovers from corrupt data and can pretty-print records', () => {
+		const dir = mkdtempSync(join(tmpdir(), 'fatigue-kit-'))
+		try {
+			const file = join(dir, 'state.json')
+			writeFileSync(file, '{broken', 'utf8')
+			const storage = fileAdapter(file, { pretty: true })
+			expect(storage.get('missing')).toBeNull()
+			storage.set('a', '1')
+			expect(readFileSync(file, 'utf8')).toContain('\n  "a": "1"\n')
 		} finally {
 			rmSync(dir, { recursive: true, force: true })
 		}
