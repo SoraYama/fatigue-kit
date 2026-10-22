@@ -4,12 +4,12 @@ description: 面向 React 18 和 19 的 Provider 与 Hooks。
 ---
 
 ```sh
-npm install fatigue-kit @fatigue-kit/react
+npm install fatigue-kit fatigue-kit-react
 ```
 
 ```tsx
 import { createFatigue } from 'fatigue-kit'
-import { FatigueProvider, useFatigueState } from '@fatigue-kit/react'
+import { FatigueProvider, useFatigueState } from 'fatigue-kit-react'
 const fatigue = createFatigue()
 function Coupon() {
   const popup = useFatigueState('coupon', [{ max: 1, every: 'day' }])

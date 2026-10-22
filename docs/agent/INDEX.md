@@ -12,7 +12,7 @@
 
 | Note | Summary |
 | --- | --- |
-| [2026-10-22-v1x-website-react](feature/2026-10-22-v1x-website-react.md) | Astro/Starlight English-first bilingual GitHub Pages website and real-engine playground; @fatigue-kit/react uses explicit actions and useSyncExternalStore for Strict Mode-safe, SSR-safe key subscriptions |
+| [2026-10-22-v1x-website-react](feature/2026-10-22-v1x-website-react.md) | Astro/Starlight English-first bilingual GitHub Pages website and real-engine playground; fatigue-kit-react uses explicit actions and useSyncExternalStore for Strict Mode-safe, SSR-safe key subscriptions |
 
 ## Bug Fixes
 
