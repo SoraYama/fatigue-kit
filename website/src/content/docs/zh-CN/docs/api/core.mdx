@@ -1,0 +1,24 @@
+---
+title: 核心 API
+description: createFatigue 与 Fatigue 实例方法。
+---
+
+## `createFatigue(options?)`
+
+选项包括 `storage`、`clock`、`namespace` 和 `maxHits`。
+
+## `tryConsume(key, rules)`
+
+检查全部规则，在允许时记录一次命中，返回 `ConsumeResult`。
+
+## `peek(key, rules)`
+
+返回相同结果结构，但不修改记录。
+
+## `reset(key?)`
+
+删除一条记录。不传 key 时删除 `storage.keys()` 可见的全部记录。
+
+## `exportRecord(key)` / `importRecord(key, record)`
+
+读取或覆盖带版本号的记录，用于迁移和调试。

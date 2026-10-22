@@ -1,0 +1,32 @@
+---
+title: Quick start
+description: Install fatigue-kit and consume your first rule set.
+---
+
+## Install
+
+```sh
+npm install fatigue-kit
+```
+
+## Create an instance
+
+```ts
+import { createFatigue } from 'fatigue-kit'
+import { localStorageAdapter } from 'fatigue-kit/adapters/local-storage'
+
+const fatigue = createFatigue({ storage: localStorageAdapter() })
+```
+
+## Check and consume
+
+```ts
+const result = fatigue.tryConsume('onboarding-guide', [
+  { max: 1, every: 'day' },
+  { cooldown: '4h' },
+])
+
+if (result.allowed) showOnboardingGuide()
+```
+
+Use `peek` for a read-only check. Use `reset`, `exportRecord` and `importRecord` for operations and debugging.

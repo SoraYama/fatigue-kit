@@ -1,0 +1,16 @@
+---
+title: 选择适配器
+description: Web、React Native、小程序与 Node.js 的存储适配器。
+---
+
+| 运行时 | 引入路径 |
+| --- | --- |
+| Web 持久化 | `fatigue-kit/adapters/local-storage` |
+| Web 每个 tab | `fatigue-kit/adapters/session-storage` |
+| React Native | `fatigue-kit/adapters/async-storage` |
+| 微信 | `fatigue-kit/adapters/weapp` |
+| 支付宝 | `fatigue-kit/adapters/alipay` |
+| Node.js | `fatigue-kit/adapters/node-file` |
+| 测试 / SSR | `fatigue-kit` 的 `memoryAdapter` |
+
+核心使用同步 `SyncStorage` 契约。React Native 适配器通过 `ready` 预载内存缓存并异步写回；应用退后台时应调用 `flush()`。

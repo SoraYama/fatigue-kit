@@ -1,0 +1,11 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro'
+const releases = [
+  ['1.0.0', 'API 冻结、coverage CI 与边界语义文档。'],
+  ['0.2.1', '升级 2026 工具链，无 API 变更。'],
+  ['0.2.0', '首次公开发布。'],
+]
+---
+<SiteLayout locale="zh-CN" title="更新日志 — fatigue-kit" description="fatigue-kit 发布历史。">
+  <section class="home-section"><h1>更新日志</h1>{releases.map(([version, body]) => <article><h2>{version}</h2><p>{body}</p><a href={`https://github.com/SoraYama/fatigue-kit/releases/tag/v${version}`}>GitHub Release</a></article>)}</section>
+</SiteLayout>

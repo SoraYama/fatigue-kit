@@ -4,3 +4,6 @@ coverage/
 *.tsbuildinfo
 *.log
 .DS_Store
+website/.astro/
+website/dist/
+packages/react/dist/

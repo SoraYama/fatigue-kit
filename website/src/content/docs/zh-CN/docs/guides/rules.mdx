@@ -1,0 +1,17 @@
+---
+title: 组合规则
+description: 滑动窗口、日历周期、冷却时间与终身上限。
+---
+
+多条规则按 AND 条件组合：每条规则都必须允许本次命中。
+
+| 规则 | 含义 |
+| --- | --- |
+| `{ max: 3, window: '7d' }` | 任意滚动七天内最多三次 |
+| `{ max: 1, every: 'day' }` | 每个本地自然日最多一次 |
+| `{ cooldown: '4h' }` | 两次命中至少间隔四小时 |
+| `{ max: 5 }` | 记录生命周期内最多五次 |
+
+日历规则支持 `day`、`week`、`month`、`year`，以及业务日 `cutoff` 和 `weekStartsOn`。
+
+`remaining` 是操作后最严格计数规则的剩余额度。只有 cooldown 等非计数规则时为 `Infinity`。`deniedBy` 是调用方传入的同一个规则对象。

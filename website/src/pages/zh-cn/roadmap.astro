@@ -1,0 +1,12 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro'
+const groups = [
+  ['Now', '发布包测试、双语文档、官网、演练场与 React bindings。'],
+  ['Exploring', '跨 tab 状态协调、IANA 时区、explain API 与异步原子消费。'],
+  ['Later', '共享预算、优先级仲裁、互斥与可视化调试工具。'],
+  ['Not planned', '服务端分布式限流、A/B 实验或远程策略管理。'],
+]
+---
+<SiteLayout locale="zh-CN" title="路线图 — fatigue-kit" description="fatigue-kit 的公开发展方向。">
+  <section class="home-section"><h1>路线图</h1><p>路线图表达方向，而非承诺发布日期。</p><div class="feature-grid">{groups.map(([title, body]) => <article><h2>{title}</h2><p>{body}</p></article>)}</div></section>
+</SiteLayout>

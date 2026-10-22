@@ -1,0 +1,18 @@
+---
+title: Test rule sets
+description: Freeze and advance time with an injected clock.
+---
+
+Inject a clock to make time deterministic:
+
+```ts
+import { createFatigue, memoryAdapter } from 'fatigue-kit'
+
+const clock = { current: 0, now: () => clock.current }
+const fatigue = createFatigue({ storage: memoryAdapter(), clock })
+
+fatigue.tryConsume('popup', [{ max: 1, every: 'day' }])
+clock.current += 24 * 60 * 60 * 1000
+```
+
+For calendar rules, prefer constructing expected timestamps with local date components. The library avoids `+ 24h` calendar arithmetic so daylight-saving transitions do not shift boundaries.

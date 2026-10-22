@@ -1,0 +1,17 @@
+---
+title: Compose rules
+description: Sliding windows, calendar limits, cooldowns and lifetime caps.
+---
+
+Rules compose as an AND condition: every rule must allow the hit.
+
+| Rule | Meaning |
+| --- | --- |
+| `{ max: 3, window: '7d' }` | At most three hits in any rolling seven days |
+| `{ max: 1, every: 'day' }` | At most one hit per local calendar day |
+| `{ cooldown: '4h' }` | At least four hours between hits |
+| `{ max: 5 }` | At most five hits over the record lifetime |
+
+Calendar rules support `day`, `week`, `month`, and `year`, plus a business-day `cutoff` and `weekStartsOn`.
+
+`remaining` is the strictest count-based allowance after the operation. It is `Infinity` when only non-counting rules such as cooldown apply. `deniedBy` is the same rule object supplied by the caller.

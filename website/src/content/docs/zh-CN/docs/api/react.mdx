@@ -1,0 +1,21 @@
+---
+title: React bindings
+description: 面向 React 18 和 19 的 Provider 与 Hooks。
+---
+
+```sh
+npm install fatigue-kit @fatigue-kit/react
+```
+
+```tsx
+import { createFatigue } from 'fatigue-kit'
+import { FatigueProvider, useFatigueState } from '@fatigue-kit/react'
+const fatigue = createFatigue()
+function Coupon() {
+  const popup = useFatigueState('coupon', [{ max: 1, every: 'day' }])
+  return <button onClick={() => popup.tryConsume()}>打开优惠</button>
+}
+<FatigueProvider value={fatigue}><Coupon /></FatigueProvider>
+```
+
+消费必须显式触发。Hooks 不会在 render 或 mount 时消费，因此 Strict Mode 与 SSR 行为可预测。通过 `useFatigueState` 执行的操作会通知相同 key 的订阅者；直接调用原始核心实例不会自动通知 React。
