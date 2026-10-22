@@ -1,4 +1,5 @@
 ---
+"fatigue-kit-react": patch
 ---
 
-Rename the unpublished React workspace to the available `fatigue-kit-react` npm package after the scoped publish was rejected.
+Publish the React bindings under the available `fatigue-kit-react` npm package name after npm rejected the unavailable scoped package.
