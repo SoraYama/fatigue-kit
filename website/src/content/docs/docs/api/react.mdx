@@ -1,24 +1,67 @@
 ---
 title: React bindings
-description: Provider and hooks for React 18 and 19.
+description: Provider and hooks for React 18 and 19, with an explicit persistent popup example.
 ---
 
 ```sh
 npm install fatigue-kit fatigue-kit-react
 ```
 
+## Browser entry
+
+Create a persistent engine once in your browser entry point. The button only displays the coupon after `tryConsume` allows it; the hooks never consume during render or mount.
+
 ```tsx
+import { useState } from 'react'
+import { createRoot } from 'react-dom/client'
 import { createFatigue } from 'fatigue-kit'
+import { localStorageAdapter } from 'fatigue-kit/adapters/local-storage'
 import { FatigueProvider, useFatigueState } from 'fatigue-kit-react'
 
-const fatigue = createFatigue()
+const fatigue = createFatigue({ storage: localStorageAdapter() })
 
 function Coupon() {
-  const popup = useFatigueState('coupon', [{ max: 1, every: 'day' }])
-  return <button onClick={() => popup.tryConsume()}>Open coupon</button>
+  const [open, setOpen] = useState(false)
+  const popup = useFatigueState('coupon', [
+    { max: 1, every: 'day' },
+    { max: 3, window: '7d' },
+    { cooldown: '4h' },
+  ])
+
+  function showCoupon() {
+    if (popup.tryConsume().allowed) setOpen(true)
+  }
+
+  return (
+    <>
+      <button onClick={showCoupon}>Show coupon</button>
+      <p>{popup.result.allowed ? 'Available' : 'Frequency cap reached'}</p>
+      {open && (
+        <section aria-label="Coupon">
+          <p>Your coupon content</p>
+          <button onClick={() => setOpen(false)}>Close</button>
+        </section>
+      )}
+    </>
+  )
 }
 
-<FatigueProvider value={fatigue}><Coupon /></FatigueProvider>
+const container = document.getElementById('root')
+if (container) {
+  createRoot(container).render(
+    <FatigueProvider value={fatigue}><Coupon /></FatigueProvider>,
+  )
+}
 ```
 
-Consumption is explicit. The hooks never consume during render or mount, which keeps Strict Mode and SSR predictable. Operations performed through `useFatigueState` notify same-key subscribers; direct writes through the raw core instance are not observed automatically.
+Use your application's accessible dialog component for a production popup; the section only illustrates conditional rendering.
+
+## State and persistence
+
+`createFatigue()` alone uses memory and loses records when recreated. This browser example uses localStorage to survive reloads. Namespace and key define record identity; partition keys when users or campaigns change. Storage failures can weaken caps, and cross-tab/device quotas are outside this API's guarantees.
+
+Operations through `useFatigueState` notify same-key subscribers. `useFatigue()` returns the raw instance: direct mutations do not automatically notify React. `tryConsume` records an allowed attempt before your UI is shown, so call it close to the display action.
+
+## SSR and hydration
+
+This entry uses browser APIs and must not execute on a server. Create request-scoped state for SSR, never a shared user-specific engine at module scope. See the [SSR and hydration guide](../../react/ssr-hydration/).

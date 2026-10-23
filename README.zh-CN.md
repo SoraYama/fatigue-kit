@@ -2,6 +2,8 @@
 
 [English](./README.md) | 简体中文
 
+[使用文档](https://sorayama.github.io/fatigue-kit/zh-cn/docs/) · [在线演练](https://sorayama.github.io/fatigue-kit/zh-cn/playground/) · [React](https://sorayama.github.io/fatigue-kit/zh-cn/docs/api/react/) · [接入求助](https://github.com/SoraYama/fatigue-kit/issues/new/choose)
+
 [![CI](https://github.com/SoraYama/fatigue-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/SoraYama/fatigue-kit/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/fatigue-kit)](https://www.npmjs.com/package/fatigue-kit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
@@ -9,15 +11,15 @@
 > 零依赖的前端频控（疲劳度控制）库，覆盖 Web、小程序、React Native 和 Node.js。
 
 `fatigue-kit` 只回答一个问题：**这个弹窗 / toast / 引导 / 优惠，现在能不能出？**
-用可组合的规则 + 可替换的存储，在所有 JS 运行时里给出同步、原子的答案。
+组合规则，接入自己的 UI 和存储，在单个 JavaScript 上下文中同步完成检查与计数。
 
 ## 特性
 
 - **规则可组合** —— 自然日 / 周 / 月（可设日界线）、滑动窗口、冷却、终身上限。任意叠加，以最严为准。
-- **原子 `tryConsume`** —— 检查与计数在同一步同步完成，连续触发不会双弹。
+- **同步 `tryConsume`** —— 在单个 JavaScript 上下文中一步完成检查与计数；跨 tab、跨进程协调需要单独的方案。
 - **全环境、按需加载** —— 零依赖核心，存储适配器按子路径引入：`localStorage`、`sessionStorage`、React Native `AsyncStorage`、微信 / 支付宝小程序、Node.js 文件。bundler 只打包你 import 的部分。
 - **可测试** —— 时钟可注入、存储可注入，记录可检查、可灌入。
-- **小而稳** —— 核心 gzip 约 3 kB；记录格式带版本号并自动修剪；存储损坏时优雅降级而不是抛错。
+- **小而稳** —— 核心零运行时依赖，记录带版本并自动修剪，损坏记录可恢复。1.0.1 的核心经 `npm run size` 实测为 2.06 kB（minified + Brotli）；同一压缩口径的 CI 预算为 3.5 kB。
 
 ## 安装
 
@@ -43,6 +45,10 @@ if (result.allowed) {
   showCouponPopup()
 }
 ```
+
+不传存储选项时默认使用内存，重新创建实例就会丢失记录。上面的 Web 示例使用 `localStorage` 保留刷新前的状态。记录范围由 namespace 和 key 决定，需要按用户或活动隔离时由调用方设计 key。`tryConsume` 允许时已经记账，请在接近实际展示的位置调用。
+
+React 18/19 应用可以使用 [`fatigue-kit-react`](./packages/react/README.md)，通过显式动作和按 key 订阅管理状态。
 
 ## 环境支持
 
@@ -145,16 +151,16 @@ expect(fatigue.peek('popup', [{ max: 1, every: 'day' }]).allowed).toBe(true)
 
 ## 已知限制（v1）
 
-- 读取在单个 JS 上下文内原子；**跨 tab / 跨进程**是 last-write-wins（基于 `BroadcastChannel` 的方案在路线图上）。
+- 在存储操作成功时，检查与计数在单个 JS 上下文内原子；**跨 tab / 跨进程**是 last-write-wins（基于 `BroadcastChannel` 的方案在路线图上）。
 - 日历规则跟随设备本地时间；IANA 时区支持在计划中。
-- RN 适配器需要在退后台时调用一次 `flush()` 才能保证写入落盘。
+- RN 需要等待预载完成，并在退后台时刷新待写入数据；进程终止或存储失败仍可能阻止持久化。
+- 清理本地存储或更换设备会重置本地历史；终身上限适用于记录存续期间。存储故障会被上报，但频控可能降级；本地状态不是跨设备的权威配额。
 
 ## 路线图
 
 路线图表达方向，而非承诺发布日期。
 
-- **Now — v1.x 产品化：**发布包测试、英语优先且中英完整对齐的文档、GitHub Pages 官网、Changelog、Roadmap 与可分享 Playground。
-- **Next — React：**以 TDD 完成 bindings，覆盖 React 18/19、Strict Mode、SSR 与 hydration。
+- **已提供 — v1.x：**发布包测试、双语文档、官网、Changelog、Roadmap、可分享 Playground 与 React 18/19 绑定，覆盖 Strict Mode、SSR 和 hydration。
 - **Exploring：**跨 tab 状态协调（最终一致）、IANA 时区、explain/debug API 与异步原子消费。
 - **Later — v2 候选：**共享预算、优先级仲裁、互斥与可视化调试工具。
 - **Not planned：**服务端分布式限流、A/B 实验平台或远程策略管理。

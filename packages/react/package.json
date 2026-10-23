@@ -1,7 +1,7 @@
 {
   "name": "fatigue-kit-react",
   "version": "1.0.1",
-  "description": "React bindings for fatigue-kit frequency capping.",
+  "description": "React 18/19 hooks for local popup and onboarding frequency capping with fatigue-kit.",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -13,6 +13,7 @@
     "url": "https://github.com/SoraYama/fatigue-kit/issues"
   },
   "homepage": "https://sorayama.github.io/fatigue-kit/docs/api/react/",
+  "keywords": ["react", "hooks", "popup", "onboarding", "frequency-capping", "fatigue-kit", "cooldown"],
   "sideEffects": false,
   "publishConfig": { "access": "public" },
   "main": "./dist/index.cjs",

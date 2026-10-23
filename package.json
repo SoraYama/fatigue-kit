@@ -132,7 +132,7 @@
   "bugs": {
     "url": "https://github.com/SoraYama/fatigue-kit/issues"
   },
-  "homepage": "https://github.com/SoraYama/fatigue-kit#readme",
+  "homepage": "https://sorayama.github.io/fatigue-kit/",
   "devDependencies": {
     "@biomejs/biome": "^2.0.0",
     "@changesets/changelog-github": "^1.0.1",
