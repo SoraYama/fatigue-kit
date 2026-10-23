@@ -54,6 +54,8 @@ Pages 工作流在构建时读取这些变量。代码合并推送后，手动�
 https://sorayama.github.io/fatigue-kit/playground/?utm_source=juejin&utm_medium=community&utm_campaign=launch_2026q4&utm_content=coupon_v1
 ```
 
+全球渠道支持 `hackernews`、`devto`、`hashnode`、`reactiflux`、`producthunt`、`javascriptweekly`、`reactstatus`、`awesome_javascript`、`awesome_react` 与 `lobsters`。新的 Reddit 分版块链接使用 `reddit_javascript`、`reddit_reactjs`、`reddit_opensource` 或 `reddit_developersindia`；旧链接的通用 `reddit` 来源继续保留。通讯使用 `utm_medium=newsletter`，精选目录使用 `referral`。当前活动为 `launch_2026q4`，内容可选 `coupon_v1` 或 `react_v1`。平台和编辑可能清理或重写参数：Lobsters 投稿使用干净 URL，精选目录可能要求普通仓库链接。白名单允许某个值，不等于保证渠道归因或获得自荐许可。
+
 后续新活动标识需主动扩充白名单，站内导航不新增 UTM。复制命令、点击反馈链接或下载 npm 包都不能证明实际采用；通过自愿填写的 [使用反馈](https://github.com/SoraYama/fatigue-kit/issues/new?template=adoption-feedback.yml) 确认项目接入，并按可选许可在至少 14 天后随访。
 
 部署后，在浏览器 DevTools Network 检查脚本成功加载、每页只有一次页面访问、复制和消费动作产生对应事件，并在 Umami 中看到结果。覆盖中英文首页、文档和演练场。用虚构分享配置检查发出的请求，确认没有 key 或记录。浏览器 mock 测试只能验证传输约定，不能证明你的 Umami 账号已收到生产数据。
