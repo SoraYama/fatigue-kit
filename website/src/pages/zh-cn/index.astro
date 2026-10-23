@@ -1,5 +1,5 @@
 ---
-import Playground from '../../components/Playground'
+import CouponDemo from '../../components/CouponDemo.astro'
 import SiteLayout from '../../layouts/SiteLayout.astro'
 const base = import.meta.env.BASE_URL.replace(/\/$/, '')
 ---
@@ -14,7 +14,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '')
         <a data-analytics-event="feedback_open" href={`${base}/zh-cn/docs/project/feedback/`}>接入求助与使用反馈</a>
       </div>
     </div>
-    <div class="demo-shell"><Playground client:idle compact locale="zh-CN" /></div>
+    <div class="demo-shell"><CouponDemo locale="zh-CN" /></div>
   </section>
   <section class="home-section">
     <h2>一个判断，四种原语。</h2>

@@ -62,6 +62,22 @@ test('shows a coupon only on an allowed explicit action and resets the demo', as
   await expect(coupon).toBeVisible()
 })
 
+test('runs the lightweight landing-page coupon demo without automatic consumption', async ({ page }) => {
+  await page.goto('')
+  await expect(page.locator('fatigue-coupon-demo')).toHaveAttribute('data-ready', 'true')
+  const coupon = page.getByRole('region', { name: 'Coupon preview' })
+  await expect(coupon).toBeHidden()
+  await page.getByRole('button', { name: 'Try consume', exact: true }).click()
+  await expect(coupon).toBeVisible()
+  await page.screenshot({ path: test.info().outputPath('landing-demo.png'), fullPage: true })
+  await page.getByRole('button', { name: 'Close coupon', exact: true }).click()
+  await page.getByRole('button', { name: 'Try consume', exact: true }).click()
+  await expect(coupon).toBeHidden()
+  await page.getByRole('button', { name: 'Advance to next available', exact: true }).click()
+  await page.getByRole('button', { name: 'Try consume', exact: true }).click()
+  await expect(coupon).toBeVisible()
+})
+
 test('provides persistent browser code and a manual share fallback when clipboard access fails', async ({ page }) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'clipboard', {
@@ -111,6 +127,28 @@ test('analytics remains disabled without configuration', async ({ page }) => {
   expect(await page.evaluate(() => window.fatigueAnalyticsEnabled)).not.toBe(true)
 })
 
+test('recovers from no active rules and rejects unsafe imported timestamps', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.message))
+  await page.goto('playground/')
+  await expect(page.locator('.playground')).toHaveAttribute('data-ready', 'true')
+  for (const label of ['Calendar limit', 'Sliding window', 'Cooldown']) {
+    await page.getByLabel(label, { exact: true }).uncheck()
+  }
+  await expect(page.getByText('Enable at least one rule to run the demo.')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Try consume', exact: true })).toBeDisabled()
+  const config = encodeConfiguration({ ...initialConfiguration, calendarEnabled: false, windowEnabled: false, cooldownEnabled: false })
+  await page.goto(`playground/?config=${config}`)
+  await expect(page.getByText('Enable at least one rule to run the demo.')).toBeVisible()
+  await page.getByLabel('Calendar limit', { exact: true }).check()
+  await page.getByLabel('Record JSON').fill('{"v":1,"hits":[1e100],"lifetime":1}')
+  await page.getByRole('button', { name: 'Import record', exact: true }).click()
+  await expect(page.getByText('Invalid record JSON', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Try consume', exact: true }).click()
+  await expect(page.getByRole('region', { name: 'Coupon preview' })).toBeVisible()
+  expect(errors).toEqual([])
+})
+
 test('analytics filters shared state and tracks only explicit successful actions on both layouts', async ({ page, context }) => {
   test.skip(process.env.FATIGUE_TEST_ANALYTICS !== '1', 'Requires the configured mock tracker run')
   await context.grantPermissions(['clipboard-read', 'clipboard-write'])
@@ -143,6 +181,7 @@ test('analytics filters shared state and tracks only explicit successful actions
   expect(documentLoads).toBeGreaterThan(0)
   await expect.poll(() => payloads.length).toBe(documentLoads)
   expect(payloads[0]?.name).toBeUndefined()
+  expect(payloads[0]?.hostname).toBe('127.0.0.1')
   await page.getByRole('button', { name: 'Try consume', exact: true }).click()
   await page.getByRole('button', { name: 'Try consume', exact: true }).click()
   await page.getByRole('button', { name: 'Try consume', exact: true }).click()

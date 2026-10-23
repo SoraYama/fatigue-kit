@@ -6,6 +6,9 @@ import {
   encodeConfiguration,
   generateCode,
   formatLocalDateTime,
+  formatISOTime,
+  isPlaygroundRecord,
+  isPlaygroundTime,
   normalizeConfiguration,
   initialConfiguration,
   type PlaygroundConfiguration,
@@ -19,10 +22,10 @@ interface Props {
 
 const copy = {
   en: {
-    preview: 'Coupon preview', close: 'Close coupon', previewText: 'This coupon appears only after an allowed attempt.', install: 'Copy install command', installed: 'Command copied', copyCode: 'Copy Web code', codeCopied: 'Code copied', copyFailed: 'Clipboard unavailable. Copy the link or code below.', shareLink: 'Share link', nextStep: 'Advance to next available', memory: 'This demo uses memory and simulated time. The generated Web code uses localStorage and your device clock.', title: 'Run the real engine.', intro: 'Compose every v1 rule, move time, and share a reproducible state.', rules: 'Rules', result: 'Result', key: 'Key', calendar: 'Calendar limit', period: 'Period', maximum: 'Maximum', cutoff: 'Business-day cutoff', weekStarts: 'Week starts on', window: 'Sliding window', days: 'Window days', cooldown: 'Cooldown', hours: 'Hours', lifetime: 'Lifetime limit', consume: 'Try consume', peek: 'Peek', reset: 'Reset', advance: 'Advance 4 hours', share: 'Copy share link', copied: 'Link copied', allowed: 'Allowed', denied: 'Denied', remaining: 'Remaining', next: 'Next available', deniedBy: 'Denied by', time: 'Simulated time', setTime: 'Set time', record: 'Record JSON', import: 'Import record', export: 'Export record', invalid: 'Invalid record JSON', feedback: 'Get help or share feedback', example: 'React integration example', code: 'Generated TypeScript', privacy: 'Rules run locally; share URLs contain the key and record. If site analytics is configured, it sends filtered page views and explicit demo/copy/link actions, never your key or record.', enabled: 'Enabled', sunday: 'Sunday', monday: 'Monday',
+    noRules: 'Enable at least one rule to run the demo.', invalidRules: 'Check the active rules and simulated dates.', unavailable: 'Unavailable', preview: 'Coupon preview', close: 'Close coupon', previewText: 'This coupon appears only after an allowed attempt.', install: 'Copy install command', installed: 'Command copied', copyCode: 'Copy Web code', codeCopied: 'Code copied', copyFailed: 'Clipboard unavailable. Copy the link or code below.', shareLink: 'Share link', nextStep: 'Advance to next available', memory: 'This demo uses memory and simulated time. The generated Web code uses localStorage and your device clock.', title: 'Run the real engine.', intro: 'Compose every v1 rule, move time, and share a reproducible state.', rules: 'Rules', result: 'Result', key: 'Key', calendar: 'Calendar limit', period: 'Period', maximum: 'Maximum', cutoff: 'Business-day cutoff', weekStarts: 'Week starts on', window: 'Sliding window', days: 'Window days', cooldown: 'Cooldown', hours: 'Hours', lifetime: 'Lifetime limit', consume: 'Try consume', peek: 'Peek', reset: 'Reset', advance: 'Advance 4 hours', share: 'Copy share link', copied: 'Link copied', allowed: 'Allowed', denied: 'Denied', remaining: 'Remaining', next: 'Next available', deniedBy: 'Denied by', time: 'Simulated time', setTime: 'Set time', record: 'Record JSON', import: 'Import record', export: 'Export record', invalid: 'Invalid record JSON', feedback: 'Get help or share feedback', example: 'React integration example', code: 'Generated TypeScript', privacy: 'Rules run locally; share URLs contain the key and record. If site analytics is configured, it sends filtered page views and explicit demo/copy/link actions, never your key or record.', enabled: 'Enabled', sunday: 'Sunday', monday: 'Monday',
   },
   'zh-CN': {
-    preview: '优惠预览', close: '关闭优惠', previewText: '只有本次消费被允许，优惠才会展示。', install: '复制安装命令', installed: '命令已复制', copyCode: '复制 Web 代码', codeCopied: '代码已复制', copyFailed: '剪贴板不可用，请手动复制下方链接或代码。', shareLink: '分享链接', nextStep: '前进到下次可用时间', memory: '演练使用内存和模拟时钟；生成的 Web 代码使用 localStorage 和设备时钟。', title: '运行真实引擎。', intro: '组合全部 v1 规则、推进时间并分享可复现状态。', rules: '规则', result: '结果', key: 'Key', calendar: '日历周期上限', period: '周期', maximum: '最大次数', cutoff: '业务日界线', weekStarts: '每周起始日', window: '滑动窗口', days: '窗口天数', cooldown: '冷却时间', hours: '小时', lifetime: '终身上限', consume: '尝试消费', peek: '只读检查', reset: '重置', advance: '前进 4 小时', share: '复制分享链接', copied: '链接已复制', allowed: '允许', denied: '拒绝', remaining: '剩余额度', next: '下次可用', deniedBy: '拒绝规则', time: '模拟时间', setTime: '设置时间', record: '记录 JSON', import: '导入记录', export: '导出记录', invalid: '记录 JSON 无效', feedback: '接入求助与使用反馈', example: 'React 接入示例', code: '生成的 TypeScript', privacy: '规则在本地运行，分享链接包含 key 与记录。若启用网站统计，仅发送过滤后的页面访问及显式演练、复制和链接操作，不发送 key 或记录。', enabled: '启用', sunday: '星期日', monday: '星期一',
+    noRules: '请至少启用一条规则再运行演练。', invalidRules: '请检查启用的规则和模拟时间。', unavailable: '不可用', preview: '优惠预览', close: '关闭优惠', previewText: '只有本次消费被允许，优惠才会展示。', install: '复制安装命令', installed: '命令已复制', copyCode: '复制 Web 代码', codeCopied: '代码已复制', copyFailed: '剪贴板不可用，请手动复制下方链接或代码。', shareLink: '分享链接', nextStep: '前进到下次可用时间', memory: '演练使用内存和模拟时钟；生成的 Web 代码使用 localStorage 和设备时钟。', title: '运行真实引擎。', intro: '组合全部 v1 规则、推进时间并分享可复现状态。', rules: '规则', result: '结果', key: 'Key', calendar: '日历周期上限', period: '周期', maximum: '最大次数', cutoff: '业务日界线', weekStarts: '每周起始日', window: '滑动窗口', days: '窗口天数', cooldown: '冷却时间', hours: '小时', lifetime: '终身上限', consume: '尝试消费', peek: '只读检查', reset: '重置', advance: '前进 4 小时', share: '复制分享链接', copied: '链接已复制', allowed: '允许', denied: '拒绝', remaining: '剩余额度', next: '下次可用', deniedBy: '拒绝规则', time: '模拟时间', setTime: '设置时间', record: '记录 JSON', import: '导入记录', export: '导出记录', invalid: '记录 JSON 无效', feedback: '接入求助与使用反馈', example: 'React 接入示例', code: '生成的 TypeScript', privacy: '规则在本地运行，分享链接包含 key 与记录。若启用网站统计，仅发送过滤后的页面访问及显式演练、复制和链接操作，不发送 key 或记录。', enabled: '启用', sunday: '星期日', monday: '星期一',
   },
 }
 
@@ -40,6 +43,7 @@ export default function Playground({ locale = 'en', compact = false }: Props) {
   const [couponOpen, setCouponOpen] = useState(false)
   const [recordText, setRecordText] = useState('null')
   const [recordError, setRecordError] = useState('')
+  const [ruleError, setRuleError] = useState('')
   const clock = useMemo(() => ({ current: configuration.now, now: () => clock.current }), [])
   clock.current = configuration.now
   const fatigue = useMemo(() => createFatigue({ storage: memoryAdapter(), clock }), [clock])
@@ -55,43 +59,66 @@ export default function Playground({ locale = 'en', compact = false }: Props) {
   }, [fatigue])
 
   useEffect(() => {
-    if (ready) setResult(fatigue.peek(configuration.key, rules))
-  }, [fatigue, configuration, ready, rules])
+    if (!ready) return
+    if (rules.length === 0) {
+      setRuleError(text.noRules)
+      setResult({ allowed: false, remaining: 0 })
+      setCouponOpen(false)
+      return
+    }
+    try {
+      setResult(fatigue.peek(configuration.key, rules))
+      setRuleError('')
+    } catch {
+      setRuleError(text.invalidRules)
+      setResult({ allowed: false, remaining: 0 })
+      setCouponOpen(false)
+    }
+  }, [fatigue, configuration, ready, rules, text])
 
   function update<K extends keyof PlaygroundConfiguration>(field: K, value: PlaygroundConfiguration[K]) {
     setConfiguration((current) => normalizeConfiguration({ ...current, [field]: value }))
   }
 
   function refresh(action: 'peek' | 'consume' | 'reset') {
-    if (action === 'reset') fatigue.reset(configuration.key)
-    const next = action === 'consume'
-      ? fatigue.tryConsume(configuration.key, rules)
-      : fatigue.peek(configuration.key, rules)
-    setResult(next)
-    if (action === 'consume') {
-      setCouponOpen(next.allowed)
-      const outcome = next.allowed ? 'allowed' : 'denied'
-      trackSiteEvent('demo_interact', { outcome })
-      demoOutcomes.current[outcome] = true
-      if (demoOutcomes.current.allowed && demoOutcomes.current.denied && !demoOutcomes.current.complete) {
-        trackSiteEvent('demo_complete')
-        demoOutcomes.current.complete = true
+    if (!ready || rules.length === 0) return
+    try {
+      if (action === 'reset') fatigue.reset(configuration.key)
+      const next = action === 'consume'
+        ? fatigue.tryConsume(configuration.key, rules)
+        : fatigue.peek(configuration.key, rules)
+      setResult(next)
+      if (action === 'consume') {
+        setCouponOpen(next.allowed)
+        const outcome = next.allowed ? 'allowed' : 'denied'
+        trackSiteEvent('demo_interact', { outcome })
+        demoOutcomes.current[outcome] = true
+        if (demoOutcomes.current.allowed && demoOutcomes.current.denied && !demoOutcomes.current.complete) {
+          trackSiteEvent('demo_complete')
+          demoOutcomes.current.complete = true
+        }
       }
+      if (action === 'reset') setCouponOpen(false)
+      const record = fatigue.exportRecord(configuration.key)
+      setRecordText(JSON.stringify(record, null, 2))
+      setConfiguration((current) => ({ ...current, record }))
+      setRuleError('')
+    } catch {
+      setRuleError(text.invalidRules)
+      setResult({ allowed: false, remaining: 0 })
+      setCouponOpen(false)
     }
-    if (action === 'reset') setCouponOpen(false)
-    const record = fatigue.exportRecord(configuration.key)
-    setRecordText(JSON.stringify(record, null, 2))
-    setConfiguration((current) => ({ ...current, record }))
   }
 
   function importRecord() {
     try {
-      const parsed = JSON.parse(recordText) as PlaygroundConfiguration['record']
+      const parsed: unknown = JSON.parse(recordText)
+      if (!isPlaygroundRecord(parsed)) throw new Error('Invalid demo record')
       if (parsed === null) fatigue.reset(configuration.key)
       else fatigue.importRecord(configuration.key, parsed)
       setRecordError('')
       setConfiguration((current) => ({ ...current, record: fatigue.exportRecord(current.key) }))
-      setResult(fatigue.peek(configuration.key, rules))
+      if (rules.length > 0) setResult(fatigue.peek(configuration.key, rules))
     } catch {
       setRecordError(text.invalid)
     }
@@ -150,10 +177,11 @@ export default function Playground({ locale = 'en', compact = false }: Props) {
           {configuration.lifetimeEnabled && <label>{text.maximum}<input type="number" min="1" value={configuration.lifetimeMax} onChange={number('lifetimeMax')} /></label>}
         </fieldset>
       </div>}
+      {ruleError && <p role="alert">{ruleError}</p>}
       {couponOpen && <section className="playground__coupon" aria-label={text.preview}><h3>{text.preview}</h3><p>{text.previewText}</p><button type="button" onClick={() => setCouponOpen(false)}>{text.close}</button></section>}
       <pre tabIndex={0} aria-label="Active frequency rules"><code>{JSON.stringify(rules, null, 2)}</code></pre>
-      <dl><div><dt>{text.remaining}</dt><dd>{String(result.remaining)}</dd></div><div><dt>{text.time}</dt><dd>{new Date(configuration.now).toISOString()}</dd></div>{result.nextAvailableAt !== undefined && <div><dt>{text.next}</dt><dd>{new Date(result.nextAvailableAt).toISOString()}</dd></div>}{result.deniedBy !== undefined && <div><dt>{text.deniedBy}</dt><dd>{JSON.stringify(result.deniedBy)}</dd></div>}</dl>
-      <div className="playground__actions"><button type="button" disabled={!ready} onClick={() => refresh('consume')}>{text.consume}</button><button type="button" onClick={() => refresh('peek')}>{text.peek}</button><button type="button" onClick={() => refresh('reset')}>{text.reset}</button><button type="button" onClick={() => update('now', configuration.now + 4 * 60 * 60 * 1000)}>{text.advance}</button>{result.nextAvailableAt !== undefined && Number.isFinite(result.nextAvailableAt) && <button type="button" onClick={() => update('now', result.nextAvailableAt!)}>{text.nextStep}</button>}{!compact && <button type="button" onClick={share}>{copied ? text.copied : text.share}</button>}</div>
+      <dl><div><dt>{text.remaining}</dt><dd>{String(result.remaining)}</dd></div><div><dt>{text.time}</dt><dd>{formatISOTime(configuration.now) ?? text.unavailable}</dd></div>{result.nextAvailableAt !== undefined && <div><dt>{text.next}</dt><dd>{formatISOTime(result.nextAvailableAt) ?? text.unavailable}</dd></div>}{result.deniedBy !== undefined && <div><dt>{text.deniedBy}</dt><dd>{JSON.stringify(result.deniedBy)}</dd></div>}</dl>
+      <div className="playground__actions"><button type="button" disabled={!ready || rules.length === 0} onClick={() => refresh('consume')}>{text.consume}</button><button type="button" disabled={!ready || rules.length === 0} onClick={() => refresh('peek')}>{text.peek}</button><button type="button" disabled={!ready || rules.length === 0} onClick={() => refresh('reset')}>{text.reset}</button><button type="button" onClick={() => update('now', configuration.now + 4 * 60 * 60 * 1000)}>{text.advance}</button>{result.nextAvailableAt !== undefined && isPlaygroundTime(result.nextAvailableAt) && <button type="button" onClick={() => update('now', result.nextAvailableAt!)}>{text.nextStep}</button>}{!compact && <button type="button" onClick={share}>{copied ? text.copied : text.share}</button>}</div>
       {!compact && <><label>{text.setTime}<input type="datetime-local" value={formatLocalDateTime(configuration.now)} onChange={(event) => update('now', new Date(event.currentTarget.value).getTime())} /></label><label>{text.record}<textarea rows={6} value={recordText} onChange={(event) => setRecordText(event.currentTarget.value)} aria-describedby="record-error" /></label><p id="record-error" role="alert">{recordError}</p><button type="button" onClick={importRecord}>{text.import}</button><h3>{text.code}</h3><pre><code>npm install fatigue-kit</code></pre><button type="button" onClick={() => copyCode('install')}>{installCopied ? text.installed : text.install}</button><pre tabIndex={0} aria-label={text.code}><code>{generateCode(configuration)}</code></pre><button type="button" onClick={() => copyCode('code')}>{codeCopied ? text.codeCopied : text.copyCode}</button><p role="status">{copyError}</p>{copyError && shareUrl && <label>{text.shareLink}<input readOnly value={shareUrl} onFocus={(event) => event.currentTarget.select()} /></label>}<p className="playground__privacy">{text.privacy}</p></>}
       {!compact && <nav className="playground__actions" aria-label={text.feedback}><a data-analytics-event="example_open" href={`${base}/${locale === 'zh-CN' ? 'zh-cn/' : ''}docs/api/react/`}>{text.example}</a><a data-analytics-event="feedback_open" href={`${base}/${locale === 'zh-CN' ? 'zh-cn/' : ''}docs/project/feedback/`}>{text.feedback}</a></nav>}
       <style>{styles}</style>

@@ -14,6 +14,7 @@ npm run build:react
 npm run dev --workspace @fatigue-kit/website
 npm test --workspace @fatigue-kit/website
 npm run build:website
+npm run test:server --workspace @fatigue-kit/website
 npm run test:e2e --workspace @fatigue-kit/website
 npm run lighthouse --workspace @fatigue-kit/website
 ```
@@ -21,7 +22,7 @@ npm run lighthouse --workspace @fatigue-kit/website
 ## Set up Umami Cloud
 
 1. [Create an Umami Cloud account](https://cloud.umami.is/signup). Google, GitHub and email signup are available; choose the service plan yourself.
-2. In **Websites → Add website**, enter name `fatigue-kit` and domain `sorayama.github.io`. Domain means the hostname, not `/fatigue-kit/`. [Official instructions](https://docs.umami.is/docs/add-a-website).
+2. In **Websites → Add website**, enter name `fatigue-kit` and domain `sorayama.me` (the current Pages redirect target; confirm the final hostname in your browser). Domain means the hostname, not `/fatigue-kit/`. [Official instructions](https://docs.umami.is/docs/add-a-website).
 3. Edit the website and open **Tracking code**. Copy the script's `src` URL and `data-website-id` value. [Official instructions](https://docs.umami.is/docs/collect-data).
 4. In this GitHub repository, go to **Settings → Secrets and variables → Actions → Variables** and create the two repository variables below. They are public tracker configuration, not API tokens or passwords.
 
@@ -32,7 +33,7 @@ npm run lighthouse --workspace @fatigue-kit/website
 
 The Pages workflow reads these variables at build time. Once the code is merged and pushed, run the **Pages** workflow or trigger a normal main-branch deployment. Changing a repository variable alone does not rebuild deployed HTML. If both variables are empty, no tracker is fetched; incomplete or invalid configuration fails the build.
 
-For local verification, copy `.env.example` to `.env.local`, fill both values, and set `PUBLIC_UMAMI_DOMAINS=127.0.0.1`. Restart the dev server. The default allowed host is the production site only. Do not enable local collection for routine development. Set `localStorage['umami.disabled'] = '1'` in your browser to exclude your own visits; remove it to opt back in. An exposed Do Not Track signal is also respected.
+For local verification, copy `.env.example` to `.env.local`, fill both values, and set `PUBLIC_UMAMI_DOMAINS=127.0.0.1`. Restart the dev server. The default allowed hosts are `sorayama.github.io` and its current redirect target `sorayama.me`; collection records the actual served hostname. Do not enable local collection for routine development. Set `localStorage['umami.disabled'] = '1'` in your browser to exclude your own visits; remove it to opt back in. An exposed Do Not Track signal is also respected.
 
 ## Verify collection and privacy
 

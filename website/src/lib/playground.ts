@@ -1,5 +1,10 @@
 import type { FatigueRecord, FatigueRule } from 'fatigue-kit'
 
+// Leave headroom for durations and one calendar year of boundary calculations.
+// These are editor limits; the library's APIs are unchanged.
+const MAX_DURATION_MS = 8640000000000000 / 2
+const MAX_TIMESTAMP_MS = MAX_DURATION_MS - 366 * 24 * 60 * 60 * 1000
+
 export type CalendarPeriod = 'day' | 'week' | 'month' | 'year'
 
 export interface PlaygroundConfiguration {
@@ -93,7 +98,7 @@ export function normalizeConfiguration(value: Partial<PlaygroundConfiguration>):
   return {
     version: 1,
     key: typeof value.key === 'string' && value.key.trim() !== '' ? value.key : initialConfiguration.key,
-    now: validTime(value.now) ? value.now : initialConfiguration.now,
+    now: isPlaygroundTime(value.now) ? value.now : initialConfiguration.now,
     calendarEnabled: boolean(value.calendarEnabled, true),
     calendarMax: positiveInteger(value.calendarMax, 1),
     calendarPeriod: period.includes(value.calendarPeriod as CalendarPeriod)
@@ -108,7 +113,7 @@ export function normalizeConfiguration(value: Partial<PlaygroundConfiguration>):
     cooldownHours: duration(value.cooldownHours, 60 * 60 * 1000, 4),
     lifetimeEnabled: boolean(value.lifetimeEnabled, false),
     lifetimeMax: positiveInteger(value.lifetimeMax, 5),
-    record: validRecord(value.record) ? value.record : null,
+    record: isPlaygroundRecord(value.record) ? value.record : null,
   }
 }
 
@@ -116,12 +121,16 @@ function positiveInteger(value: unknown, fallback: number): number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value > 0 ? value : fallback
 }
 
-function validTime(value: unknown): value is number {
-  return typeof value === 'number' && Number.isFinite(new Date(value).getTime())
+export function isPlaygroundTime(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value) && Math.abs(value) <= MAX_TIMESTAMP_MS
 }
 
 function duration(value: unknown, unit: number, fallback: number): number {
-  return typeof value === 'number' && value > 0 && Number.isSafeInteger(value * unit) ? value : fallback
+  return typeof value === 'number' && value > 0 && Number.isSafeInteger(value * unit) && value * unit <= MAX_DURATION_MS ? value : fallback
+}
+
+export function formatISOTime(value: number): string | null {
+  return Number.isFinite(new Date(value).getTime()) ? new Date(value).toISOString() : null
 }
 
 export function formatLocalDateTime(timestamp: number): string {
@@ -140,16 +149,16 @@ function integerRange(value: unknown, min: number, max: number, fallback: number
     : fallback
 }
 
-function validRecord(value: unknown): value is FatigueRecord {
+export function isPlaygroundRecord(value: unknown): value is FatigueRecord | null {
   if (value === null) return true
   if (typeof value !== 'object') return false
   const record = value as Partial<FatigueRecord>
   return (
     record.v === 1 &&
     Array.isArray(record.hits) &&
-    record.hits.every((hit) => typeof hit === 'number' && Number.isFinite(hit)) &&
+    record.hits.every(isPlaygroundTime) &&
     typeof record.lifetime === 'number' &&
-    Number.isFinite(record.lifetime)
+    Number.isSafeInteger(record.lifetime) && record.lifetime >= 0
   )
 }
 

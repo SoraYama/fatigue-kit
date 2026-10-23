@@ -74,4 +74,25 @@ describe('playground configuration', () => {
     const now = new Date(2026, 9, 23, 8, 30).getTime()
     expect(new Date(formatLocalDateTime(now)).getTime()).toBe(now)
   })
+
+  it('rejects imported records with timestamps outside the supported date range', () => {
+    const configuration = decodeConfiguration(encodeConfiguration({
+      ...initialConfiguration,
+      record: { v: 1, hits: [1e100], lifetime: 1 },
+    }))
+    expect(configuration.record).toBeNull()
+  })
+
+  it.each([
+    { ...initialConfiguration, cooldownHours: 2500000000, calendarEnabled: false, windowEnabled: false },
+    { ...initialConfiguration, now: 8640000000000000 },
+  ])('reserves date headroom for calendar and duration calculations', (input) => {
+    const configuration = decodeConfiguration(encodeConfiguration(input))
+    const engine = createFatigue({ clock: { now: () => configuration.now } })
+    expect(() => engine.tryConsume(configuration.key, toRules(configuration))).not.toThrow()
+    const result = engine.peek(configuration.key, toRules(configuration))
+    if (result.nextAvailableAt !== undefined) {
+      expect(() => new Date(result.nextAvailableAt!).toISOString()).not.toThrow()
+    }
+  })
 })

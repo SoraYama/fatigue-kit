@@ -1,0 +1,109 @@
+---
+interface Props { locale?: 'en' | 'zh-CN' }
+const locale = Astro.props.locale ?? 'en'
+const text = locale === 'zh-CN' ? {
+  title: '试着展示一次优惠。', intro: '每天一次、七天三次，两次至少间隔四小时。',
+  allowed: '允许', denied: '拒绝', remaining: '剩余额度', next: '下次可用',
+  consume: '尝试消费', reset: '重置', advance: '前进到下次可用时间',
+  preview: '优惠预览', content: '只有本次消费被允许，优惠才会展示。', close: '关闭优惠',
+  note: '演示使用内存和模拟时钟，不会保存真实用户记录。',
+} : {
+  title: 'Try showing a coupon.', intro: 'Once a day. Three times in seven days. Four hours between shows.',
+  allowed: 'Allowed', denied: 'Denied', remaining: 'Remaining', next: 'Next available',
+  consume: 'Try consume', reset: 'Reset', advance: 'Advance to next available',
+  preview: 'Coupon preview', content: 'This coupon appears only after an allowed attempt.', close: 'Close coupon',
+  note: 'In-memory records and a simulated clock. No real user records are saved.',
+}
+---
+<fatigue-coupon-demo data-allowed={text.allowed} data-denied={text.denied} data-ready="false">
+  <h2>{text.title}</h2>
+  <p>{text.intro}</p>
+  <p class="decision" data-decision aria-live="polite">{text.allowed}</p>
+  <section class="coupon" data-coupon aria-label={text.preview} hidden>
+    <h3>{text.preview}</h3><p>{text.content}</p>
+    <button type="button" data-action="close">{text.close}</button>
+  </section>
+  <dl>
+    <div><dt>{text.remaining}</dt><dd data-remaining>1</dd></div>
+    <div><dt>{text.next}</dt><dd data-next>—</dd></div>
+  </dl>
+  <div class="actions">
+    <button type="button" data-action="consume" disabled>{text.consume}</button>
+    <button type="button" data-action="reset" disabled>{text.reset}</button>
+    <button type="button" data-action="advance" disabled>{text.advance}</button>
+  </div>
+  <p class="note">{text.note}</p>
+</fatigue-coupon-demo>
+<script>
+  import { createFatigue, type ConsumeResult } from 'fatigue-kit'
+  import { trackSiteEvent } from '../lib/analytics'
+  import { initialConfiguration, toRules } from '../lib/playground'
+
+  class CouponDemo extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.ready === 'true') return
+      const clock = { current: initialConfiguration.now, now: () => clock.current }
+      const engine = createFatigue({ clock })
+      const rules = toRules(initialConfiguration)
+      const outcomes = { allowed: false, denied: false, complete: false }
+      const find = <T extends HTMLElement>(selector: string) => this.querySelector<T>(selector)!
+      const coupon = find<HTMLElement>('[data-coupon]')
+      const advance = find<HTMLButtonElement>('[data-action="advance"]')
+      let nextTime: number | undefined
+
+      const render = (result: ConsumeResult) => {
+        find('[data-decision]').textContent = result.allowed ? this.dataset.allowed! : this.dataset.denied!
+        find('[data-remaining]').textContent = String(result.remaining)
+        nextTime = engine.peek('coupon-popup', rules).nextAvailableAt
+        find('[data-next]').textContent = nextTime === undefined ? '—' : new Date(nextTime).toISOString()
+        advance.disabled = nextTime === undefined
+      }
+      find<HTMLButtonElement>('[data-action="consume"]').addEventListener('click', () => {
+        const result = engine.tryConsume('coupon-popup', rules)
+        coupon.hidden = !result.allowed
+        render(result)
+        const outcome = result.allowed ? 'allowed' : 'denied'
+        trackSiteEvent('demo_interact', { outcome })
+        outcomes[outcome] = true
+        if (outcomes.allowed && outcomes.denied && !outcomes.complete) {
+          trackSiteEvent('demo_complete')
+          outcomes.complete = true
+        }
+      })
+      find<HTMLButtonElement>('[data-action="reset"]').addEventListener('click', () => {
+        engine.reset('coupon-popup')
+        coupon.hidden = true
+        render(engine.peek('coupon-popup', rules))
+      })
+      advance.addEventListener('click', () => {
+        if (nextTime === undefined) return
+        clock.current = nextTime
+        coupon.hidden = true
+        render(engine.peek('coupon-popup', rules))
+      })
+      find<HTMLButtonElement>('[data-action="close"]').addEventListener('click', () => { coupon.hidden = true })
+      find<HTMLButtonElement>('[data-action="consume"]').disabled = false
+      find<HTMLButtonElement>('[data-action="reset"]').disabled = false
+      render(engine.peek('coupon-popup', rules))
+      this.dataset.ready = 'true'
+    }
+  }
+  if (!customElements.get('fatigue-coupon-demo')) customElements.define('fatigue-coupon-demo', CouponDemo)
+</script>
+<style>
+  fatigue-coupon-demo { display: grid; gap: 1rem; }
+  h2 { margin: 0; font-size: clamp(1.6rem, 4vw, 2.4rem); }
+  p { margin: 0; }
+  .decision { font-weight: 700; }
+  .note, dt { color: var(--sl-color-gray-2); font-size: .85rem; }
+  .coupon { border: 2px solid var(--sl-color-accent); border-radius: .75rem; padding: 1rem; }
+  .coupon h3 { margin-block: 0 .5rem; }
+  .coupon button { margin-top: .75rem; }
+  dl { display: grid; gap: 1rem; margin: 0; }
+  dd { margin: .25rem 0 0; font-family: var(--sl-font-mono); overflow-wrap: anywhere; }
+  .actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+  button { border: 1px solid var(--sl-color-gray-4); border-radius: .5rem; background: var(--sl-color-gray-6); color: var(--sl-color-white); padding: .65rem .8rem; font: inherit; cursor: pointer; }
+  button[data-action='consume'] { background: var(--sl-color-accent); color: var(--sl-color-black); border-color: var(--sl-color-accent); }
+  button:disabled { opacity: .5; cursor: default; }
+  button:focus-visible { outline: 3px solid var(--sl-color-accent); outline-offset: 2px; }
+</style>

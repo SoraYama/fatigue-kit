@@ -94,7 +94,8 @@ export function initializeAnalytics() {
   } catch { return }
 
   // Install the filter before fetching the tracker; it applies to every send.
-  window.fatigueBeforeSend = (type, payload) => sanitizeAnalyticsPayload(type, payload, config)
+  const context = { ...config, origin: window.location.origin }
+  window.fatigueBeforeSend = (type, payload) => sanitizeAnalyticsPayload(type, payload, context)
   const script = document.createElement('script')
   script.id = 'fatigue-umami'
   script.src = config.scriptUrl

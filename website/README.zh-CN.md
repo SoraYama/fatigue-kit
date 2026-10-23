@@ -14,6 +14,7 @@ npm run build:react
 npm run dev --workspace @fatigue-kit/website
 npm test --workspace @fatigue-kit/website
 npm run build:website
+npm run test:server --workspace @fatigue-kit/website
 npm run test:e2e --workspace @fatigue-kit/website
 npm run lighthouse --workspace @fatigue-kit/website
 ```
@@ -21,7 +22,7 @@ npm run lighthouse --workspace @fatigue-kit/website
 ## 申请 Umami Cloud 并接入
 
 1. 打开 [Umami Cloud 注册页](https://cloud.umami.is/signup)，可使用 Google、GitHub 或邮箱注册，按自己的需要选择服务方案。
-2. 在 **Websites → Add website** 添加站点：Name 填 `fatigue-kit`，Domain 填 `sorayama.github.io`。Domain 是域名，不填写 `/fatigue-kit/` 路径。[官方添加站点说明](https://docs.umami.is/docs/add-a-website)。
+2. 在 **Websites → Add website** 添加站点：Name 填 `fatigue-kit`，Domain 填 `sorayama.me`（当前 Pages 跳转目标，请以浏览器最终域名确认）。Domain 是域名，不填写 `/fatigue-kit/` 路径。[官方添加站点说明](https://docs.umami.is/docs/add-a-website)。
 3. 编辑该站点，打开 **Tracking code**，复制脚本的 `src` 地址与 `data-website-id` 值。[官方获取统计代码说明](https://docs.umami.is/docs/collect-data)。
 4. 打开本 GitHub 仓库的 **Settings → Secrets and variables → Actions → Variables**，新增以下两个 Repository variables。它们是公开的脚本配置，不是 API token 或密码。
 
@@ -32,7 +33,7 @@ npm run lighthouse --workspace @fatigue-kit/website
 
 Pages 工作流在构建时读取这些变量。代码合并推送后，手动运行 **Pages** 工作流或触发正常的 main 分支部署。只修改变量不会重建已部署的 HTML。两项都留空时不请求统计脚本；仅配置一项或配置无效时构建会报错。
 
-本地验证时，把 `.env.example` 复制为 `.env.local`，填写两项参数，并设置 `PUBLIC_UMAMI_DOMAINS=127.0.0.1`，然后重启开发服务器。默认只允许生产域名采集，日常开发不要开启本地统计。在浏览器设置 `localStorage['umami.disabled'] = '1'` 可排除自己的访问，删除该值恢复采集；浏览器提供的 Do Not Track 信号也会被尊重。
+本地验证时，把 `.env.example` 复制为 `.env.local`，填写两项参数，并设置 `PUBLIC_UMAMI_DOMAINS=127.0.0.1`，然后重启开发服务器。默认兼容 `sorayama.github.io` 与当前跳转目标 `sorayama.me`，统计记录实际访问的域名；日常开发不要开启本地统计。在浏览器设置 `localStorage['umami.disabled'] = '1'` 可排除自己的访问，删除该值恢复采集；浏览器提供的 Do Not Track 信号也会被尊重。
 
 ## 验证数据与隐私过滤
 

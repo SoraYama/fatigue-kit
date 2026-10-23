@@ -37,6 +37,7 @@ jobs:
       - run: npm run test:e2e --workspace @fatigue-kit/website -- --grep analytics
         env:
           FATIGUE_TEST_ANALYTICS: '1'
+      - run: npm run test:server --workspace @fatigue-kit/website
       - run: npm run lighthouse --workspace @fatigue-kit/website
       - uses: actions/upload-pages-artifact@v4
         if: github.event_name != 'pull_request'
