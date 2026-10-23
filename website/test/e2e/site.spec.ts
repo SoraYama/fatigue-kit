@@ -45,3 +45,34 @@ test('supports keyboard focus and has no serious accessibility violations', asyn
   const results = await new AxeBuilder({ page }).analyze()
   expect(results.violations.filter((violation) => ['serious', 'critical'].includes(violation.impact ?? ''))).toEqual([])
 })
+
+test('shows a coupon only on an allowed explicit action and resets the demo', async ({ page }) => {
+  await page.goto('playground/')
+  await expect(page.locator('.playground')).toHaveAttribute('data-ready', 'true')
+  const coupon = page.getByRole('region', { name: 'Coupon preview' })
+  await expect(coupon).toHaveCount(0)
+  await page.getByRole('button', { name: 'Try consume', exact: true }).click()
+  await expect(coupon).toBeVisible()
+  await page.getByRole('button', { name: 'Close coupon', exact: true }).click()
+  await page.getByRole('button', { name: 'Try consume', exact: true }).click()
+  await expect(coupon).toHaveCount(0)
+  await page.getByRole('button', { name: 'Reset', exact: true }).click()
+  await page.getByRole('button', { name: 'Try consume', exact: true }).click()
+  await expect(coupon).toBeVisible()
+})
+
+test('provides persistent browser code and a manual share fallback when clipboard access fails', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: () => Promise.reject(new Error('Clipboard blocked')) },
+      configurable: true,
+    })
+  })
+  await page.goto('playground/')
+  await expect(page.locator('.playground')).toHaveAttribute('data-ready', 'true')
+  await expect(page.getByLabel('Generated TypeScript')).toContainText('localStorageAdapter()')
+  await page.getByRole('button', { name: 'Copy share link' }).click()
+  await expect(page.getByText('Clipboard unavailable. Copy the link or code below.')).toBeVisible()
+  await expect(page.getByLabel('Share link', { exact: true })).toHaveValue(/config=/)
+  await expect(page.getByRole('button', { name: 'Link copied' })).toHaveCount(0)
+})

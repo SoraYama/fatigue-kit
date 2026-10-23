@@ -69,7 +69,7 @@ export function decodeConfiguration(encoded: string | null): PlaygroundConfigura
   try {
     const parsed = JSON.parse(fromBase64Url(encoded)) as Partial<PlaygroundConfiguration>
     if (parsed.version !== 1) return initialConfiguration
-    return sanitize(parsed)
+    return normalizeConfiguration(parsed)
   } catch {
     return initialConfiguration
   }
@@ -77,41 +77,57 @@ export function decodeConfiguration(encoded: string | null): PlaygroundConfigura
 
 export function generateCode(configuration: PlaygroundConfiguration): string {
   return `import { createFatigue } from 'fatigue-kit'
+import { localStorageAdapter } from 'fatigue-kit/adapters/local-storage'
 
-const fatigue = createFatigue()
-const result = fatigue.tryConsume(${JSON.stringify(configuration.key)}, ${JSON.stringify(toRules(configuration), null, 2)})`
+// Browser entry only. Records survive reloads; rules use device local time.
+const fatigue = createFatigue({ storage: localStorageAdapter() })
+const result = fatigue.tryConsume(${JSON.stringify(configuration.key)}, ${JSON.stringify(toRules(configuration), null, 2)})
+
+if (result.allowed) {
+  // Display your existing popup here.
+}`
 }
 
-function sanitize(value: Partial<PlaygroundConfiguration>): PlaygroundConfiguration {
+export function normalizeConfiguration(value: Partial<PlaygroundConfiguration>): PlaygroundConfiguration {
   const period: CalendarPeriod[] = ['day', 'week', 'month', 'year']
   return {
     version: 1,
     key: typeof value.key === 'string' && value.key.trim() !== '' ? value.key : initialConfiguration.key,
-    now: finite(value.now, initialConfiguration.now),
+    now: validTime(value.now) ? value.now : initialConfiguration.now,
     calendarEnabled: boolean(value.calendarEnabled, true),
-    calendarMax: positive(value.calendarMax, 1),
+    calendarMax: positiveInteger(value.calendarMax, 1),
     calendarPeriod: period.includes(value.calendarPeriod as CalendarPeriod)
       ? (value.calendarPeriod as CalendarPeriod)
       : 'day',
-    cutoff: typeof value.cutoff === 'string' && /^\d{2}:\d{2}$/.test(value.cutoff) ? value.cutoff : '00:00',
+    cutoff: typeof value.cutoff === 'string' && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value.cutoff) ? value.cutoff : '00:00',
     weekStartsOn: integerRange(value.weekStartsOn, 0, 6, 1) as PlaygroundConfiguration['weekStartsOn'],
     windowEnabled: boolean(value.windowEnabled, true),
-    windowMax: positive(value.windowMax, 3),
-    windowDays: positive(value.windowDays, 7),
+    windowMax: positiveInteger(value.windowMax, 3),
+    windowDays: duration(value.windowDays, 24 * 60 * 60 * 1000, 7),
     cooldownEnabled: boolean(value.cooldownEnabled, true),
-    cooldownHours: positive(value.cooldownHours, 4),
+    cooldownHours: duration(value.cooldownHours, 60 * 60 * 1000, 4),
     lifetimeEnabled: boolean(value.lifetimeEnabled, false),
-    lifetimeMax: positive(value.lifetimeMax, 5),
+    lifetimeMax: positiveInteger(value.lifetimeMax, 5),
     record: validRecord(value.record) ? value.record : null,
   }
 }
 
-function positive(value: unknown, fallback: number): number {
-  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : fallback
+function positiveInteger(value: unknown, fallback: number): number {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value > 0 ? value : fallback
 }
 
-function finite(value: unknown, fallback: number): number {
-  return typeof value === 'number' && Number.isFinite(value) ? value : fallback
+function validTime(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(new Date(value).getTime())
+}
+
+function duration(value: unknown, unit: number, fallback: number): number {
+  return typeof value === 'number' && value > 0 && Number.isSafeInteger(value * unit) ? value : fallback
+}
+
+export function formatLocalDateTime(timestamp: number): string {
+  const date = new Date(timestamp)
+  const pad = (value: number) => String(value).padStart(2, '0')
+  return `${String(date.getFullYear()).padStart(4, '0')}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
 function boolean(value: unknown, fallback: boolean): boolean {
