@@ -1,4 +1,4 @@
-> **Last updated**: 2026-10-22 (completed v1.x docs, playground, React matrix, E2E, accessibility and Lighthouse gates)
+> **Last updated**: 2026-10-23 (fixed Starlight Chinese sidebar translation lookup and added rendered-label validation)
 
 # Agent Knowledge Index
 
@@ -19,6 +19,7 @@
 
 | Note | Summary |
 | --- | --- |
+| [2026-10-23-starlight-sidebar-i18n](bugfix/2026-10-23-starlight-sidebar-i18n.md) | Chinese pages showed English sidebar labels because Starlight looks up translations by `lang` (`zh-CN`), not route locale key (`zh-cn`); validate rendered localized HTML |
 | [2026-10-22-starlight-sidebar-base-path](bugfix/2026-10-22-starlight-sidebar-base-path.md) | Starlight defaultLocale `en` generated `/fatigue-kit/en/...` sidebar links while static output lived at `/fatigue-kit/...`; use `locales.root` and verify every generated internal href against `dist/` |
 
 ## Optimizations
