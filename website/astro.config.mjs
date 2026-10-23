@@ -22,6 +22,7 @@ export default defineConfig({
       social: [{ icon: 'github', label: 'GitHub', href: repository }],
       editLink: { baseUrl: `${repository}/edit/main/website/` },
       customCss: ['./src/styles/custom.css'],
+      components: { Head: './src/components/DocsHead.astro' },
       sidebar: [
         {
           label: 'Start',
@@ -93,6 +94,7 @@ export default defineConfig({
           items: [
             { label: 'Compatibility', translations: { 'zh-CN': '兼容性' }, link: '/docs/project/compatibility/' },
             { label: 'Known limitations', translations: { 'zh-CN': '已知限制' }, link: '/docs/project/known-limitations/' },
+            { label: 'Help and feedback', translations: { 'zh-CN': '求助与反馈' }, link: '/docs/project/feedback/' },
             { label: 'Release policy', translations: { 'zh-CN': '发布策略' }, link: '/docs/project/release-policy/' },
             { label: 'Changelog', translations: { 'zh-CN': '更新日志' }, link: '/changelog/' },
             { label: 'Roadmap', translations: { 'zh-CN': '路线图' }, link: '/roadmap/' },

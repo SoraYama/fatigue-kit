@@ -1,5 +1,10 @@
 import type { FatigueRecord, FatigueRule } from 'fatigue-kit'
 
+// Leave headroom for durations and one calendar year of boundary calculations.
+// These are editor limits; the library's APIs are unchanged.
+const MAX_DURATION_MS = 8640000000000000 / 2
+const MAX_TIMESTAMP_MS = MAX_DURATION_MS - 366 * 24 * 60 * 60 * 1000
+
 export type CalendarPeriod = 'day' | 'week' | 'month' | 'year'
 
 export interface PlaygroundConfiguration {
@@ -69,7 +74,7 @@ export function decodeConfiguration(encoded: string | null): PlaygroundConfigura
   try {
     const parsed = JSON.parse(fromBase64Url(encoded)) as Partial<PlaygroundConfiguration>
     if (parsed.version !== 1) return initialConfiguration
-    return sanitize(parsed)
+    return normalizeConfiguration(parsed)
   } catch {
     return initialConfiguration
   }
@@ -77,41 +82,61 @@ export function decodeConfiguration(encoded: string | null): PlaygroundConfigura
 
 export function generateCode(configuration: PlaygroundConfiguration): string {
   return `import { createFatigue } from 'fatigue-kit'
+import { localStorageAdapter } from 'fatigue-kit/adapters/local-storage'
 
-const fatigue = createFatigue()
-const result = fatigue.tryConsume(${JSON.stringify(configuration.key)}, ${JSON.stringify(toRules(configuration), null, 2)})`
+// Browser entry only. Records survive reloads; rules use device local time.
+const fatigue = createFatigue({ storage: localStorageAdapter() })
+const result = fatigue.tryConsume(${JSON.stringify(configuration.key)}, ${JSON.stringify(toRules(configuration), null, 2)})
+
+if (result.allowed) {
+  // Display your existing popup here.
+}`
 }
 
-function sanitize(value: Partial<PlaygroundConfiguration>): PlaygroundConfiguration {
+export function normalizeConfiguration(value: Partial<PlaygroundConfiguration>): PlaygroundConfiguration {
   const period: CalendarPeriod[] = ['day', 'week', 'month', 'year']
   return {
     version: 1,
     key: typeof value.key === 'string' && value.key.trim() !== '' ? value.key : initialConfiguration.key,
-    now: finite(value.now, initialConfiguration.now),
+    now: isPlaygroundTime(value.now) ? value.now : initialConfiguration.now,
     calendarEnabled: boolean(value.calendarEnabled, true),
-    calendarMax: positive(value.calendarMax, 1),
+    calendarMax: positiveInteger(value.calendarMax, 1),
     calendarPeriod: period.includes(value.calendarPeriod as CalendarPeriod)
       ? (value.calendarPeriod as CalendarPeriod)
       : 'day',
-    cutoff: typeof value.cutoff === 'string' && /^\d{2}:\d{2}$/.test(value.cutoff) ? value.cutoff : '00:00',
+    cutoff: typeof value.cutoff === 'string' && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value.cutoff) ? value.cutoff : '00:00',
     weekStartsOn: integerRange(value.weekStartsOn, 0, 6, 1) as PlaygroundConfiguration['weekStartsOn'],
     windowEnabled: boolean(value.windowEnabled, true),
-    windowMax: positive(value.windowMax, 3),
-    windowDays: positive(value.windowDays, 7),
+    windowMax: positiveInteger(value.windowMax, 3),
+    windowDays: duration(value.windowDays, 24 * 60 * 60 * 1000, 7),
     cooldownEnabled: boolean(value.cooldownEnabled, true),
-    cooldownHours: positive(value.cooldownHours, 4),
+    cooldownHours: duration(value.cooldownHours, 60 * 60 * 1000, 4),
     lifetimeEnabled: boolean(value.lifetimeEnabled, false),
-    lifetimeMax: positive(value.lifetimeMax, 5),
-    record: validRecord(value.record) ? value.record : null,
+    lifetimeMax: positiveInteger(value.lifetimeMax, 5),
+    record: isPlaygroundRecord(value.record) ? value.record : null,
   }
 }
 
-function positive(value: unknown, fallback: number): number {
-  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : fallback
+function positiveInteger(value: unknown, fallback: number): number {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value > 0 ? value : fallback
 }
 
-function finite(value: unknown, fallback: number): number {
-  return typeof value === 'number' && Number.isFinite(value) ? value : fallback
+export function isPlaygroundTime(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value) && Math.abs(value) <= MAX_TIMESTAMP_MS
+}
+
+function duration(value: unknown, unit: number, fallback: number): number {
+  return typeof value === 'number' && value > 0 && Number.isSafeInteger(value * unit) && value * unit <= MAX_DURATION_MS ? value : fallback
+}
+
+export function formatISOTime(value: number): string | null {
+  return Number.isFinite(new Date(value).getTime()) ? new Date(value).toISOString() : null
+}
+
+export function formatLocalDateTime(timestamp: number): string {
+  const date = new Date(timestamp)
+  const pad = (value: number) => String(value).padStart(2, '0')
+  return `${String(date.getFullYear()).padStart(4, '0')}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
 function boolean(value: unknown, fallback: boolean): boolean {
@@ -124,16 +149,16 @@ function integerRange(value: unknown, min: number, max: number, fallback: number
     : fallback
 }
 
-function validRecord(value: unknown): value is FatigueRecord {
+export function isPlaygroundRecord(value: unknown): value is FatigueRecord | null {
   if (value === null) return true
   if (typeof value !== 'object') return false
   const record = value as Partial<FatigueRecord>
   return (
     record.v === 1 &&
     Array.isArray(record.hits) &&
-    record.hits.every((hit) => typeof hit === 'number' && Number.isFinite(hit)) &&
+    record.hits.every(isPlaygroundTime) &&
     typeof record.lifetime === 'number' &&
-    Number.isFinite(record.lifetime)
+    Number.isSafeInteger(record.lifetime) && record.lifetime >= 0
   )
 }
 

@@ -1,21 +1,67 @@
 ---
-title: React bindings
-description: 面向 React 18 和 19 的 Provider 与 Hooks。
+title: React 绑定
+description: 面向 React 18 和 19 的 Provider、Hooks 与显式持久化弹窗示例。
 ---
 
 ```sh
 npm install fatigue-kit fatigue-kit-react
 ```
 
+## 浏览器入口
+
+在浏览器入口创建一次持久化实例。点击按钮后，只有 `tryConsume` 允许才展示优惠；Hooks 不在 render 或 mount 时消费。
+
 ```tsx
+import { useState } from 'react'
+import { createRoot } from 'react-dom/client'
 import { createFatigue } from 'fatigue-kit'
+import { localStorageAdapter } from 'fatigue-kit/adapters/local-storage'
 import { FatigueProvider, useFatigueState } from 'fatigue-kit-react'
-const fatigue = createFatigue()
+
+const fatigue = createFatigue({ storage: localStorageAdapter() })
+
 function Coupon() {
-  const popup = useFatigueState('coupon', [{ max: 1, every: 'day' }])
-  return <button onClick={() => popup.tryConsume()}>打开优惠</button>
+  const [open, setOpen] = useState(false)
+  const popup = useFatigueState('coupon', [
+    { max: 1, every: 'day' },
+    { max: 3, window: '7d' },
+    { cooldown: '4h' },
+  ])
+
+  function showCoupon() {
+    if (popup.tryConsume().allowed) setOpen(true)
+  }
+
+  return (
+    <>
+      <button onClick={showCoupon}>展示优惠</button>
+      <p>{popup.result.allowed ? '可以展示' : '已达到频控上限'}</p>
+      {open && (
+        <section aria-label="优惠">
+          <p>你的优惠内容</p>
+          <button onClick={() => setOpen(false)}>关闭</button>
+        </section>
+      )}
+    </>
+  )
 }
-<FatigueProvider value={fatigue}><Coupon /></FatigueProvider>
+
+const container = document.getElementById('root')
+if (container) {
+  createRoot(container).render(
+    <FatigueProvider value={fatigue}><Coupon /></FatigueProvider>,
+  )
+}
 ```
 
-消费必须显式触发。Hooks 不会在 render 或 mount 时消费，因此 Strict Mode 与 SSR 行为可预测。通过 `useFatigueState` 执行的操作会通知相同 key 的订阅者；直接调用原始核心实例不会自动通知 React。
+生产弹窗请使用应用已有的无障碍对话框组件；这里的 section 仅演示条件渲染。
+
+## 状态与持久化
+
+单独调用 `createFatigue()` 默认使用内存，重新创建实例会丢失记录。此浏览器示例通过 localStorage 保留刷新前的状态。namespace 和 key 决定记录范围，用户或活动变化时请设计隔离键。存储失败可能使频控降级；此 API 不保证跨 tab 或跨设备的权威配额。
+
+通过 `useFatigueState` 执行操作会通知相同 key 的订阅者。`useFatigue()` 返回原始实例，直接调用它不会自动通知 React。`tryConsume` 允许时已经记账，应在接近实际展示的位置调用。
+
+## SSR 与水合
+
+此入口使用浏览器 API，不能在服务端执行。SSR 应使用请求级状态，不要在模块作用域共享用户专属实例。参见 [SSR 与水合指南](../../react/ssr-hydration/)。

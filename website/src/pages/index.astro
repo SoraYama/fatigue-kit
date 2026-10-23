@@ -1,5 +1,5 @@
 ---
-import Playground from '../components/Playground'
+import CouponDemo from '../components/CouponDemo.astro'
 import SiteLayout from '../layouts/SiteLayout.astro'
 const base = import.meta.env.BASE_URL.replace(/\/$/, '')
 ---
@@ -9,11 +9,12 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '')
       <h1>Show it when it matters.</h1>
       <p>Composable frequency capping for popups, toasts and guides across every JavaScript runtime.</p>
       <div class="hero-actions">
-        <a href={`${base}/docs/quick-start/`}>Get started</a>
+        <a data-analytics-event="example_open" href={`${base}/docs/quick-start/`}>Get started</a>
         <a href={`${base}/playground/`}>Open playground</a>
+        <a data-analytics-event="feedback_open" href={`${base}/docs/project/feedback/`}>Get help or share feedback</a>
       </div>
     </div>
-    <div class="demo-shell"><Playground client:idle compact /></div>
+    <div class="demo-shell"><CouponDemo /></div>
   </section>
   <section class="home-section">
     <h2>One decision. Four primitives.</h2>
@@ -21,7 +22,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '')
     <div class="feature-grid">
       <article><h3>Atomic by default</h3><p><code>tryConsume</code> checks and records in one synchronous step, preventing double popups in one JavaScript context.</p></article>
       <article><h3>Seven adapters</h3><p>Web, session, React Native, WeChat, Alipay, Node.js and memory.</p></article>
-      <article><h3>2.06 kB</h3><p>Zero-dependency core, measured and protected by CI.</p></article>
+      <article><h3>2.06 kB</h3><p>Core, minified + Brotli (1.0.1). A 3.5 kB CI budget uses the same compression.</p></article>
     </div>
   </section>
 </SiteLayout>

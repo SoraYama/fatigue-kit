@@ -1,0 +1,17 @@
+---
+import { resolveAnalyticsConfiguration } from '../lib/analytics'
+import AnalyticsLoader from './AnalyticsLoader.astro'
+
+const configuration = resolveAnalyticsConfiguration(
+  import.meta.env.PUBLIC_UMAMI_SCRIPT_URL,
+  import.meta.env.PUBLIC_UMAMI_WEBSITE_ID,
+)
+// The Pages hostname currently redirects to the owner's custom domain.
+const domains = (import.meta.env.PUBLIC_UMAMI_DOMAINS || `${Astro.site!.hostname},sorayama.me`).split(',').map((value: string) => value.trim())
+---
+{configuration && <AnalyticsLoader configuration={{
+  ...configuration,
+  domains,
+  path: Astro.url.pathname,
+  origin: Astro.site!.origin,
+}} />}

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+  <rect width="1280" height="640" fill="#fbfcfb"/>
+  <rect x="0" y="0" width="14" height="640" fill="#12664f"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="72" y="98" fill="#12664f" font-size="32" font-weight="700">fatigue-kit</text>
+    <text x="72" y="230" fill="#18211e" font-size="64" font-weight="700" letter-spacing="-2">A little less</text>
+    <text x="72" y="306" fill="#18211e" font-size="64" font-weight="700" letter-spacing="-2">interruption.</text>
+    <text x="72" y="370" fill="#4d5d57" font-size="26">Local frequency capping for your UI.</text>
+    <text x="72" y="412" fill="#4d5d57" font-size="26">Popups. Toasts. Onboarding.</text>
+    <text x="72" y="570" fill="#12664f" font-size="22">Bring your UI. Keep your rules testable.</text>
+    <rect x="746" y="100" width="462" height="440" rx="20" fill="#edf1ef" stroke="#d9dfdd"/>
+    <text x="782" y="151" fill="#18211e" font-size="25" font-weight="700">Coupon popup</text>
+    <g fill="#4d5d57" font-family="Consolas, monospace" font-size="21">
+      <text x="782" y="211">1 / calendar day</text>
+      <text x="782" y="254">3 / rolling 7 days</text>
+      <text x="782" y="297">4 hours between shows</text>
+    </g>
+    <path d="M782 330H1172" stroke="#d9dfdd"/>
+    <rect x="782" y="360" width="136" height="46" rx="23" fill="#12664f"/>
+    <text x="810" y="390" fill="#ffffff" font-size="22" font-weight="700">Allowed</text>
+    <text x="938" y="390" fill="#4d5d57" font-size="21">First attempt</text>
+    <rect x="782" y="432" width="136" height="46" rx="23" fill="#d9dfdd"/>
+    <text x="815" y="462" fill="#18211e" font-size="22" font-weight="700">Denied</text>
+    <text x="938" y="462" fill="#4d5d57" font-size="21">Try again now</text>
+  </g>
+</svg>

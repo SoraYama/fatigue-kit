@@ -1,0 +1,10 @@
+---
+interface Props {
+  configuration: { scriptUrl: string; websiteId: string; domains: string[]; path: string; origin: string }
+}
+---
+<meta name="fatigue-analytics" content={JSON.stringify(Astro.props.configuration)} />
+<script>
+  import { initializeAnalytics } from '../lib/analytics'
+  initializeAnalytics()
+</script>

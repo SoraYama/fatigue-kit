@@ -6,18 +6,22 @@
 
 English | [简体中文](./README.zh-CN.md)
 
+[Documentation](https://sorayama.github.io/fatigue-kit/docs/) · [Try the playground](https://sorayama.github.io/fatigue-kit/playground/) · [React](https://sorayama.github.io/fatigue-kit/docs/api/react/) · [Get help](https://github.com/SoraYama/fatigue-kit/issues/new/choose)
+
 > Zero-dependency frequency capping for Web, mini-programs, React Native and Node.js.
 
 `fatigue-kit` answers one question: **should this popup / toast / guide / coupon be shown now?**
-Compose simple rules, back them by any storage, and get an atomic, testable answer — synchronously — in every JS runtime.
+Compose rules, bring your own UI and storage, and check and count synchronously within one JavaScript context.
+
+![Daily caps, sliding windows and cooldowns for a coupon popup](https://raw.githubusercontent.com/SoraYama/fatigue-kit/main/website/public/social-preview.png)
 
 ## Features
 
 - **Composable rules** — calendar day / week / month (custom cutoff), sliding window, cooldown, lifetime cap. Stack any number of rules; the strictest wins.
-- **Atomic `tryConsume`** — check and count in one synchronous step, so double triggers can never double-fire.
+- **Synchronous `tryConsume`** — check and count in one step within a single JavaScript context. Cross-tab and cross-process coordination require a separate solution.
 - **Every environment, on demand** — zero-dependency core with storage adapters as subpath exports: `localStorage`, `sessionStorage`, React Native `AsyncStorage`, WeChat / Alipay mini-programs, Node.js file. Bundlers ship only what you import.
 - **Testable** — inject the clock, inject the storage, inspect and seed records.
-- **Small & safe** — ~3 kB gzip core, versioned self-pruning record format, corrupt storage degrades instead of throwing.
+- **Small & safe** — zero runtime dependencies, a versioned self-pruning record format, and corrupt-record recovery. The core measures 2.06 kB minified + Brotli with `npm run size` (1.0.1); the CI budget is 3.5 kB using that same compression.
 
 ## Install
 
@@ -43,6 +47,10 @@ if (result.allowed) {
   showCouponPopup()
 }
 ```
+
+Without a storage option, the engine uses memory and forgets records when recreated. The Web example above uses `localStorage` to survive reloads. Records belong to your chosen namespace and key; partition keys by user or campaign when needed. `tryConsume` records an allowed attempt before your UI is shown, so call it close to the display action.
+
+React 18/19 applications can use [`fatigue-kit-react`](./packages/react/README.md) for explicit actions and key-scoped state subscriptions.
 
 ## Environments
 
@@ -145,16 +153,16 @@ expect(fatigue.peek('popup', [{ max: 1, every: 'day' }]).allowed).toBe(true)
 
 ## Known limitations (v1)
 
-- Reads are atomic within one JS context; **cross-tab / cross-process** races are last-write-wins (a `BroadcastChannel`-based mode is on the roadmap).
+- Check-and-count is atomic within one JS context when storage operations succeed; **cross-tab / cross-process** races are last-write-wins (a `BroadcastChannel`-based mode is on the roadmap).
 - Calendar rules use device local time; IANA timezone support is planned.
-- The RN adapter needs a `flush()` call on app-background to guarantee durability.
+- Await RN hydration and flush pending writes on app-background; termination or storage failures can still prevent persistence.
+- Clearing local storage or changing devices resets local history. Lifetime caps apply while the record is retained. Storage failures are reported but can weaken frequency caps; local state is not an authoritative cross-device quota.
 
 ## Roadmap
 
 The roadmap describes direction, not promised release dates.
 
-- **Now — v1.x productization:** packed-package tests, English-first bilingual documentation, a GitHub Pages website, changelog, roadmap and shareable playground.
-- **Next — React:** TDD-built bindings covering React 18/19, Strict Mode, SSR and hydration.
+- **Available — v1.x:** packed-package tests, bilingual documentation, website, changelog, roadmap, shareable playground and React 18/19 bindings with Strict Mode, SSR and hydration coverage.
 - **Exploring:** cross-tab coordination (eventual consistency), IANA timezones, explain/debug APIs and asynchronous atomic consumption.
 - **Later — v2 candidates:** shared budgets, priority arbitration, mutual exclusion and visual debugging tools.
 - **Not planned:** distributed server-side rate limiting, an A/B testing platform or remote policy management.

@@ -14,7 +14,7 @@
 
 **目标（v1）**
 
-1. 零运行时依赖；核心 gzip ≤ 3.5 kB。
+1. 零运行时依赖；核心 minified + Brotli ≤ 3.5 kB。
 2. 全环境：Web/H5、微信/支付宝小程序、React Native、Node.js，统一 API。
 3. 按需加载：adapter 走 subpath exports，只用多少装多少。
 4. 原子 `tryConsume`，同 key 快速连点不会双弹。
@@ -149,7 +149,7 @@
 | 持久化 adapter | local-storage | weapp | alipay | async-storage | node-file |
 | 会话级 adapter | session-storage | memory | memory | memory | memory |
 | 按需加载 | subpath + tree-shaking | require 子路径 | require 子路径 | subpath | subpath |
-| 核心体积 | ≤3.5 kB gzip | 同左 | 同左 | 同左 | 同左 |
+| 核心体积 | ≤3.5 kB minified + Brotli | 同左 | 同左 | 同左 | 同左 |
 
 ## 6. 测试计划（已落地）
 
@@ -198,7 +198,7 @@ fatigue-kit/
 路线图表达方向而非发布日期承诺。
 
 - **Now — v1.x 产品化**：npm tarball 消费测试与覆盖率门禁；英语为 canonical、简体中文完整对齐的文档体系；基于 Astro/Starlight 的 GitHub Pages 官网；首页、文档、Changelog、Roadmap 与可分享 Playground。
-- **Next — v1.x React 生态**：以严格 TDD 完成 `fatigue-kit-react`，覆盖 React 18/19、Strict Mode、SSR、hydration 与发布包测试；官网交互示例使用 bindings 自测。
+- **已交付 — v1.x React 生态**：通过 TDD 完成 `fatigue-kit-react`，覆盖 React 18/19、Strict Mode、SSR、hydration 与发布包测试；官网交互示例使用 bindings 自测。
 - **Exploring**：跨 tab 状态协调（目标先定义为传播与最终一致，不承诺同步强原子性）；IANA 时区；逐规则 explain/debug API；异步原子消费的可行性。
 - **Later — v2 候选**：分组/全局预算、优先级仲裁、互斥与候选选择、可视化调试工具。冻结 v2 API 前至少收集 2～3 个真实业务案例。
 - **Not planned**：服务端分布式限流、A/B 实验平台、远程策略管理平台。

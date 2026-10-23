@@ -8,6 +8,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "test": "vitest run",
+    "test:server": "node --test scripts/static-server.test.mjs",
     "test:e2e": "playwright test",
     "lighthouse": "node scripts/lighthouse.mjs"
   },

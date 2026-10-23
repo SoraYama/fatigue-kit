@@ -1,5 +1,5 @@
 ---
-import Playground from '../../components/Playground'
+import CouponDemo from '../../components/CouponDemo.astro'
 import SiteLayout from '../../layouts/SiteLayout.astro'
 const base = import.meta.env.BASE_URL.replace(/\/$/, '')
 ---
@@ -9,11 +9,12 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '')
       <h1>只在重要时刻展示。</h1>
       <p>面向弹窗、toast 与引导的组合式频控，在每个 JavaScript 运行时使用同一个 API。</p>
       <div class="hero-actions">
-        <a href={`${base}/zh-cn/docs/quick-start/`}>快速开始</a>
+        <a data-analytics-event="example_open" href={`${base}/zh-cn/docs/quick-start/`}>快速开始</a>
         <a href={`${base}/zh-cn/playground/`}>打开演练场</a>
+        <a data-analytics-event="feedback_open" href={`${base}/zh-cn/docs/project/feedback/`}>接入求助与使用反馈</a>
       </div>
     </div>
-    <div class="demo-shell"><Playground client:idle compact locale="zh-CN" /></div>
+    <div class="demo-shell"><CouponDemo locale="zh-CN" /></div>
   </section>
   <section class="home-section">
     <h2>一个判断，四种原语。</h2>
@@ -21,7 +22,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '')
     <div class="feature-grid">
       <article><h3>默认原子</h3><p><code>tryConsume</code> 同步完成检查与记录，避免单个 JavaScript 上下文内重复弹出。</p></article>
       <article><h3>七个适配器</h3><p>覆盖 Web、会话、React Native、微信、支付宝、Node.js 与内存。</p></article>
-      <article><h3>2.06 kB</h3><p>零依赖核心，体积由 CI 持续守护。</p></article>
+      <article><h3>2.06 kB</h3><p>1.0.1 核心经 minify + Brotli 的体积；同口径 CI 预算为 3.5 kB。</p></article>
     </div>
   </section>
 </SiteLayout>
