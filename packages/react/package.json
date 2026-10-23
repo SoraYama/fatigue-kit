@@ -1,6 +1,6 @@
 {
   "name": "fatigue-kit-react",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "React 18/19 hooks for local popup and onboarding frequency capping with fatigue-kit.",
   "type": "module",
   "license": "MIT",
@@ -30,7 +30,7 @@
   "files": ["dist"],
   "engines": { "node": ">=18" },
   "peerDependencies": {
-    "fatigue-kit": "^1.0.1",
+    "fatigue-kit": "^1.0.2",
     "react": "^18.0.0 || ^19.0.0"
   },
   "scripts": {
