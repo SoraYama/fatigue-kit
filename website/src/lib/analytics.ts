@@ -2,8 +2,13 @@ const eventNames = ['demo_interact', 'demo_complete', 'code_copy', 'install_copy
 type SiteEvent = typeof eventNames[number]
 
 const campaigns: Record<string, readonly string[]> = {
-  utm_source: ['juejin', 'v2ex', 'hackernews', 'reddit', 'devto', 'github', 'wechat', 'zhihu'],
-  utm_medium: ['community', 'article', 'social', 'referral'],
+  utm_source: [
+    'juejin', 'v2ex', 'hackernews', 'reddit', 'devto', 'github', 'wechat', 'zhihu',
+    'javascriptweekly', 'reactstatus', 'reactiflux', 'hashnode', 'producthunt',
+    'reddit_javascript', 'reddit_reactjs', 'reddit_opensource', 'reddit_developersindia',
+    'awesome_javascript', 'awesome_react', 'lobsters',
+  ],
+  utm_medium: ['community', 'article', 'social', 'referral', 'newsletter'],
   utm_campaign: ['launch_2026q4'],
   utm_content: ['coupon_v1', 'react_v1', 'readme', 'sidebar', 'footer'],
 }

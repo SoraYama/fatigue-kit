@@ -42,8 +42,34 @@ describe('optional website analytics', () => {
   it('drops unknown events, identification, and unapproved UTM values', () => {
     expect(sanitizeAnalyticsPayload('identify', { id: 'user' }, context)).toBe(false)
     expect(sanitizeAnalyticsPayload('event', { name: 'customer-42' }, context)).toBe(false)
-    const payload = sanitizeAnalyticsPayload('event', { url: '/?utm_source=customer-42&config=secret', referrer: 'not a URL' }, context)
+    const payload = sanitizeAnalyticsPayload('event', { url: '/?utm_source=customer-42&utm_medium=private-medium&utm_campaign=private-campaign&utm_content=private-content&config=secret', referrer: 'not a URL' }, context)
     expect(payload).toMatchObject({ url: context.path, referrer: '' })
+  })
+
+  it.each([
+    ['javascriptweekly', 'newsletter'],
+    ['reactstatus', 'newsletter'],
+    ['reactiflux', 'community'],
+    ['hashnode', 'article'],
+    ['producthunt', 'community'],
+    ['reddit_javascript', 'community'],
+    ['reddit_reactjs', 'community'],
+    ['reddit_opensource', 'community'],
+    ['reddit_developersindia', 'community'],
+    ['awesome_javascript', 'referral'],
+    ['awesome_react', 'referral'],
+    ['lobsters', 'community'],
+  ])('preserves %s attribution while removing private share state', (source, medium) => {
+    const payload = sanitizeAnalyticsPayload('event', {
+      url: `/?utm_source=${source}&utm_medium=${medium}&utm_campaign=launch_2026q4&utm_content=coupon_v1&config=private-record&key=private-user#private-hash`,
+      name: 'example_open',
+      data: { key: 'private-user', record: 'private-record' },
+    }, context)
+    expect(payload).toMatchObject({
+      url: `${context.path}?utm_source=${source}&utm_medium=${medium}&utm_campaign=launch_2026q4&utm_content=coupon_v1`,
+      data: { surface: 'playground', locale: 'en' },
+    })
+    expect(JSON.stringify(payload)).not.toContain('private')
   })
 
   it('uses the built page path and locale instead of user-controlled URL paths', () => {
