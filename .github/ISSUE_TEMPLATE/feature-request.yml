@@ -1,0 +1,18 @@
+name: Feature request / 功能建议
+description: Explain the problem in your project / 描述项目中的实际问题
+title: '[Feature] '
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Scenario and unmet need / 场景与未满足的需求
+      description: What are you trying to show, on which platform, and what blocks you? / 希望在哪个平台控制什么展示行为？目前卡在哪里？
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Current approach and alternatives / 当前方案与替代方式
+      description: Describe your rules, workaround and why it is insufficient. / 描述规则、临时方案及其不足。
+    validations:
+      required: true

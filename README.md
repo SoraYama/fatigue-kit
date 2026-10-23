@@ -13,6 +13,8 @@ English | [简体中文](./README.zh-CN.md)
 `fatigue-kit` answers one question: **should this popup / toast / guide / coupon be shown now?**
 Compose rules, bring your own UI and storage, and check and count synchronously within one JavaScript context.
 
+![Daily caps, sliding windows and cooldowns for a coupon popup](https://raw.githubusercontent.com/SoraYama/fatigue-kit/main/website/public/social-preview.png)
+
 ## Features
 
 - **Composable rules** — calendar day / week / month (custom cutoff), sliding window, cooldown, lifetime cap. Stack any number of rules; the strictest wins.

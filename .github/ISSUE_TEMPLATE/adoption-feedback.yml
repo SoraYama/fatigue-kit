@@ -1,0 +1,38 @@
+name: Adoption feedback / 使用反馈
+description: Share a real integration, a blocker, or why you stopped / 分享实际接入、阻碍或停止采用的原因
+title: '[Feedback] '
+body:
+  - type: markdown
+    attributes:
+      value: Public issue contents are visible to everyone. You may describe the project anonymously; no business source code or contact details are required. / Issue 内容公开可见，可匿名描述项目，无需提供业务源码或联系方式。
+  - type: textarea
+    id: context
+    attributes:
+      label: Platform, scenario, versions and discovery source / 平台、场景、版本与发现渠道
+      description: What did you use before? Why try fatigue-kit? Use a fictional project name if needed. / 之前使用什么方案？为什么尝试 fatigue-kit？项目名可以虚构。
+    validations:
+      required: true
+  - type: dropdown
+    id: status
+    attributes:
+      label: Adoption status / 采用状态
+      options:
+        - Evaluating / 评估中
+        - Integrated / 已接入
+        - Still using after 14 days / 接入至少 14 天后继续使用
+        - Stopped / 已停止
+    validations:
+      required: true
+  - type: textarea
+    id: experience
+    attributes:
+      label: What worked, what blocked you, or why you stopped / 有效之处、接入阻碍或停止原因
+    validations:
+      required: true
+  - type: checkboxes
+    id: permissions
+    attributes:
+      label: Optional permissions / 可选许可
+      options:
+        - label: I agree to a follow-up in this issue. / 我同意在此 Issue 中接受后续随访。
+        - label: You may quote this feedback anonymously in project documentation. / 允许在项目文档中匿名引用本反馈。

@@ -13,6 +13,8 @@
 `fatigue-kit` 只回答一个问题：**这个弹窗 / toast / 引导 / 优惠，现在能不能出？**
 组合规则，接入自己的 UI 和存储，在单个 JavaScript 上下文中同步完成检查与计数。
 
+![优惠弹窗的日历上限、滑动窗口与冷却组合示例](https://raw.githubusercontent.com/SoraYama/fatigue-kit/main/website/public/social-preview.png)
+
 ## 特性
 
 - **规则可组合** —— 自然日 / 周 / 月（可设日界线）、滑动窗口、冷却、终身上限。任意叠加，以最严为准。

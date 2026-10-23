@@ -1,0 +1,35 @@
+name: Bug or integration help / 问题与接入求助
+description: Report unexpected behavior with a reproducible example / 提供可复现案例，帮助定位问题
+title: '[Help] '
+body:
+  - type: markdown
+    attributes:
+      value: Please remove real user identifiers, private URLs and business records. Playground share links contain the key and record. / 请先移除真实用户标识、私有链接和业务记录，演练分享链接会包含 key 与记录。
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Scenario, expected and actual behavior / 场景、预期与实际行为
+      description: What should appear, when, and what happened instead? Is this blocking integration? / 希望什么内容在何时展示？实际发生了什么？是否阻碍接入？
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Package versions / 包版本
+      placeholder: fatigue-kit 1.x, fatigue-kit-react 1.x (if used)
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Platform, adapter and scope / 平台、存储与隔离方式
+      description: Browser/runtime version, adapter, namespace/key design, reloads, multiple tabs, clock changes, Strict Mode and storage errors. Use fictional identifiers. / 浏览器或运行时版本、adapter、namespace/key 设计；是否涉及刷新、多标签页、时钟变化、Strict Mode 或存储错误。标识请使用虚构值。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal code or sanitized Playground link / 最小代码或脱敏演练链接
+      description: Include the rules, reproduction steps and any workaround. / 请包含规则、复现步骤和已知绕过方法。
+    validations:
+      required: true

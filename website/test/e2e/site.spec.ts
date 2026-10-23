@@ -76,3 +76,27 @@ test('provides persistent browser code and a manual share fallback when clipboar
   await expect(page.getByLabel('Share link', { exact: true })).toHaveValue(/config=/)
   await expect(page.getByRole('button', { name: 'Link copied' })).toHaveCount(0)
 })
+
+test('serves one usable social image on standalone and documentation pages in both languages', async ({ page }) => {
+  for (const path of ['', 'docs/', 'zh-cn/', 'zh-cn/docs/']) {
+    await page.goto(path)
+    const meta = page.locator('meta[property="og:image"]')
+    await expect(meta).toHaveCount(1)
+    const url = await meta.getAttribute('content')
+    expect(url).toBe('https://sorayama.github.io/fatigue-kit/social-preview.png')
+    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary_large_image')
+  }
+  const response = await page.request.get('/fatigue-kit/social-preview.png')
+  expect(response.ok()).toBe(true)
+  const png = await response.body()
+  expect(png.readUInt32BE(16)).toBe(1280)
+  expect(png.readUInt32BE(20)).toBe(640)
+})
+
+test('connects the Chinese landing page to actionable integration and adoption feedback', async ({ page }) => {
+  await page.goto('zh-cn/')
+  await page.getByRole('link', { name: '接入求助与使用反馈', exact: true }).click()
+  await expect(page.getByRole('heading', { level: 1, name: '求助与反馈' })).toBeVisible()
+  await expect(page.getByRole('link', { name: '接入求助或报告问题', exact: true })).toHaveAttribute('href', /template=bug-report\.yml/)
+  await expect(page.getByRole('link', { name: '分享使用反馈', exact: true })).toHaveAttribute('href', /template=adoption-feedback\.yml/)
+})
