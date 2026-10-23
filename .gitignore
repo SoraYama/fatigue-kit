@@ -10,3 +10,4 @@ packages/react/dist/
 website/test-results/
 website/playwright-report/
 /docs/agent/
+website/.env.local

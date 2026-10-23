@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
+import { encodeConfiguration, initialConfiguration } from '../../src/lib/playground'
 
 test('navigates docs without broken base or locale paths', async ({ page, isMobile }) => {
   await page.goto('docs/')
@@ -99,4 +100,61 @@ test('connects the Chinese landing page to actionable integration and adoption f
   await expect(page.getByRole('heading', { level: 1, name: '求助与反馈' })).toBeVisible()
   await expect(page.getByRole('link', { name: '接入求助或报告问题', exact: true })).toHaveAttribute('href', /template=bug-report\.yml/)
   await expect(page.getByRole('link', { name: '分享使用反馈', exact: true })).toHaveAttribute('href', /template=adoption-feedback\.yml/)
+})
+
+test('analytics remains disabled without configuration', async ({ page }) => {
+  test.skip(process.env.FATIGUE_TEST_ANALYTICS === '1', 'This run uses a configured mock tracker')
+  await page.goto('playground/')
+  await expect(page.locator('.playground')).toHaveAttribute('data-ready', 'true')
+  await expect(page.locator('#fatigue-umami')).toHaveCount(0)
+  await page.getByRole('button', { name: 'Try consume', exact: true }).click()
+  expect(await page.evaluate(() => window.fatigueAnalyticsEnabled)).not.toBe(true)
+})
+
+test('analytics filters shared state and tracks only explicit successful actions on both layouts', async ({ page, context }) => {
+  test.skip(process.env.FATIGUE_TEST_ANALYTICS !== '1', 'Requires the configured mock tracker run')
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+  const payloads: Record<string, unknown>[] = []
+  let documentLoads = 0
+  page.on('request', (request) => {
+    if (request.resourceType() === 'document') documentLoads += 1
+  })
+  await page.route('https://analytics.example.test/api/send', async (route) => {
+    payloads.push(route.request().postDataJSON())
+    await route.fulfill({ contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*' }, body: '{}' })
+  })
+  await page.route('https://analytics.example.test/script.js', (route) => route.fulfill({
+    contentType: 'application/javascript',
+    body: `window.umami = { track(name, data) {
+      const payload = window.fatigueBeforeSend('event', {
+        url: location.href, referrer: 'https://example.org/private-user?token=secret',
+        title: document.title, name, data
+      });
+      return payload ? fetch('https://analytics.example.test/api/send', {
+        method: 'POST', body: JSON.stringify(payload)
+      }) : Promise.resolve();
+    }};`,
+  }))
+  const config = encodeConfiguration({ ...initialConfiguration, key: 'private-customer-42' })
+  await page.goto(`playground/?config=${config}&utm_source=juejin&utm_campaign=launch_2026q4`)
+  await expect(page.locator('.playground')).toHaveAttribute('data-ready', 'true')
+  // Vite may reload once while optimizing the React island on first boot.
+  // Each actual document load must produce exactly one pageview and no action event.
+  expect(documentLoads).toBeGreaterThan(0)
+  await expect.poll(() => payloads.length).toBe(documentLoads)
+  expect(payloads[0]?.name).toBeUndefined()
+  await page.getByRole('button', { name: 'Try consume', exact: true }).click()
+  await page.getByRole('button', { name: 'Try consume', exact: true }).click()
+  await page.getByRole('button', { name: 'Try consume', exact: true }).click()
+  await page.getByRole('button', { name: 'Copy Web code', exact: true }).click()
+  await page.getByRole('button', { name: 'Copy install command', exact: true }).click()
+  await expect.poll(() => payloads.filter((payload) => payload.name === 'code_copy').length).toBe(1)
+  await expect.poll(() => payloads.filter((payload) => payload.name === 'install_copy').length).toBe(1)
+  expect(payloads.filter((payload) => payload.name === 'demo_interact')).toHaveLength(3)
+  expect(payloads.filter((payload) => payload.name === 'demo_complete')).toHaveLength(1)
+  expect(JSON.stringify(payloads)).not.toMatch(/config=|private-customer|private-user|secret|"record"|"key"/)
+  expect(payloads[0]?.url).toContain('utm_source=juejin')
+  await page.goto('docs/')
+  await expect.poll(() => payloads.filter((payload) => payload.name === undefined).length).toBe(documentLoads)
+  expect(payloads.at(-1)?.url).toBe('/fatigue-kit/docs/')
 })

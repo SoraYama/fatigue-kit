@@ -1,5 +1,6 @@
 ---
 import SharePreview from '../components/SharePreview.astro'
+import Analytics from '../components/Analytics.astro'
 interface Props {
   title: string
   description: string
@@ -24,6 +25,7 @@ const alternate = locale === 'zh-CN' ? base : `${base}/zh-cn`
     <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)} />
     <meta name="twitter:card" content="summary_large_image" />
     <SharePreview />
+    <Analytics />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <link rel="alternate" hreflang={locale === 'en' ? 'zh-CN' : 'en'} href={new URL(alternate, Astro.site)} />
     <link rel="alternate" hreflang="x-default" href={new URL(base, Astro.site)} />
@@ -52,7 +54,7 @@ const alternate = locale === 'zh-CN' ? base : `${base}/zh-cn`
       <span>fatigue-kit · MIT</span>
       <a href="https://github.com/SoraYama/fatigue-kit">GitHub</a>
       <a href="https://www.npmjs.com/package/fatigue-kit">npm</a>
-      <a href={`${localized}/docs/project/feedback/`}>{locale === 'zh-CN' ? '求助与反馈' : 'Help and feedback'}</a>
+      <a data-analytics-event="feedback_open" href={`${localized}/docs/project/feedback/`}>{locale === 'zh-CN' ? '求助与反馈' : 'Help and feedback'}</a>
     </footer>
     <script is:inline>
       document.getElementById('theme-toggle')?.addEventListener('click', () => {

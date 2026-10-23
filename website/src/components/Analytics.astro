@@ -1,0 +1,19 @@
+---
+import { resolveAnalyticsConfiguration } from '../lib/analytics'
+
+const configuration = resolveAnalyticsConfiguration(
+  import.meta.env.PUBLIC_UMAMI_SCRIPT_URL,
+  import.meta.env.PUBLIC_UMAMI_WEBSITE_ID,
+)
+const domains = (import.meta.env.PUBLIC_UMAMI_DOMAINS || Astro.site!.hostname).split(',').map((value: string) => value.trim())
+---
+{configuration && <meta name="fatigue-analytics" content={JSON.stringify({
+  ...configuration,
+  domains,
+  path: Astro.url.pathname,
+  origin: Astro.site!.origin,
+})} />}
+<script>
+  import { initializeAnalytics } from '../lib/analytics'
+  initializeAnalytics()
+</script>

@@ -9,9 +9,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '')
       <h1>Show it when it matters.</h1>
       <p>Composable frequency capping for popups, toasts and guides across every JavaScript runtime.</p>
       <div class="hero-actions">
-        <a href={`${base}/docs/quick-start/`}>Get started</a>
+        <a data-analytics-event="example_open" href={`${base}/docs/quick-start/`}>Get started</a>
         <a href={`${base}/playground/`}>Open playground</a>
-        <a href={`${base}/docs/project/feedback/`}>Get help or share feedback</a>
+        <a data-analytics-event="feedback_open" href={`${base}/docs/project/feedback/`}>Get help or share feedback</a>
       </div>
     </div>
     <div class="demo-shell"><Playground client:idle compact /></div>

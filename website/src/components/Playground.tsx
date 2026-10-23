@@ -1,5 +1,6 @@
 import { createFatigue, memoryAdapter, type ConsumeResult } from 'fatigue-kit'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { trackSiteEvent } from '../lib/analytics'
 import {
   decodeConfiguration,
   encodeConfiguration,
@@ -18,10 +19,10 @@ interface Props {
 
 const copy = {
   en: {
-    preview: 'Coupon preview', close: 'Close coupon', previewText: 'This coupon appears only after an allowed attempt.', copyCode: 'Copy Web code', codeCopied: 'Code copied', copyFailed: 'Clipboard unavailable. Copy the link or code below.', shareLink: 'Share link', nextStep: 'Advance to next available', memory: 'This demo uses memory and simulated time. The generated Web code uses localStorage and your device clock.', title: 'Run the real engine.', intro: 'Compose every v1 rule, move time, and share a reproducible state.', rules: 'Rules', result: 'Result', key: 'Key', calendar: 'Calendar limit', period: 'Period', maximum: 'Maximum', cutoff: 'Business-day cutoff', weekStarts: 'Week starts on', window: 'Sliding window', days: 'Window days', cooldown: 'Cooldown', hours: 'Hours', lifetime: 'Lifetime limit', consume: 'Try consume', peek: 'Peek', reset: 'Reset', advance: 'Advance 4 hours', share: 'Copy share link', copied: 'Link copied', allowed: 'Allowed', denied: 'Denied', remaining: 'Remaining', next: 'Next available', deniedBy: 'Denied by', time: 'Simulated time', setTime: 'Set time', record: 'Record JSON', import: 'Import record', export: 'Export record', invalid: 'Invalid record JSON', feedback: 'Get help or share feedback', example: 'React integration example', code: 'Generated TypeScript', privacy: 'Everything runs locally in your browser. Shared URLs may contain the key and record.', enabled: 'Enabled', sunday: 'Sunday', monday: 'Monday',
+    preview: 'Coupon preview', close: 'Close coupon', previewText: 'This coupon appears only after an allowed attempt.', install: 'Copy install command', installed: 'Command copied', copyCode: 'Copy Web code', codeCopied: 'Code copied', copyFailed: 'Clipboard unavailable. Copy the link or code below.', shareLink: 'Share link', nextStep: 'Advance to next available', memory: 'This demo uses memory and simulated time. The generated Web code uses localStorage and your device clock.', title: 'Run the real engine.', intro: 'Compose every v1 rule, move time, and share a reproducible state.', rules: 'Rules', result: 'Result', key: 'Key', calendar: 'Calendar limit', period: 'Period', maximum: 'Maximum', cutoff: 'Business-day cutoff', weekStarts: 'Week starts on', window: 'Sliding window', days: 'Window days', cooldown: 'Cooldown', hours: 'Hours', lifetime: 'Lifetime limit', consume: 'Try consume', peek: 'Peek', reset: 'Reset', advance: 'Advance 4 hours', share: 'Copy share link', copied: 'Link copied', allowed: 'Allowed', denied: 'Denied', remaining: 'Remaining', next: 'Next available', deniedBy: 'Denied by', time: 'Simulated time', setTime: 'Set time', record: 'Record JSON', import: 'Import record', export: 'Export record', invalid: 'Invalid record JSON', feedback: 'Get help or share feedback', example: 'React integration example', code: 'Generated TypeScript', privacy: 'Rules run locally; share URLs contain the key and record. If site analytics is configured, it sends filtered page views and explicit demo/copy/link actions, never your key or record.', enabled: 'Enabled', sunday: 'Sunday', monday: 'Monday',
   },
   'zh-CN': {
-    preview: '优惠预览', close: '关闭优惠', previewText: '只有本次消费被允许，优惠才会展示。', copyCode: '复制 Web 代码', codeCopied: '代码已复制', copyFailed: '剪贴板不可用，请手动复制下方链接或代码。', shareLink: '分享链接', nextStep: '前进到下次可用时间', memory: '演练使用内存和模拟时钟；生成的 Web 代码使用 localStorage 和设备时钟。', title: '运行真实引擎。', intro: '组合全部 v1 规则、推进时间并分享可复现状态。', rules: '规则', result: '结果', key: 'Key', calendar: '日历周期上限', period: '周期', maximum: '最大次数', cutoff: '业务日界线', weekStarts: '每周起始日', window: '滑动窗口', days: '窗口天数', cooldown: '冷却时间', hours: '小时', lifetime: '终身上限', consume: '尝试消费', peek: '只读检查', reset: '重置', advance: '前进 4 小时', share: '复制分享链接', copied: '链接已复制', allowed: '允许', denied: '拒绝', remaining: '剩余额度', next: '下次可用', deniedBy: '拒绝规则', time: '模拟时间', setTime: '设置时间', record: '记录 JSON', import: '导入记录', export: '导出记录', invalid: '记录 JSON 无效', feedback: '接入求助与使用反馈', example: 'React 接入示例', code: '生成的 TypeScript', privacy: '所有操作均在浏览器本地完成。分享链接可能包含 key 和记录。', enabled: '启用', sunday: '星期日', monday: '星期一',
+    preview: '优惠预览', close: '关闭优惠', previewText: '只有本次消费被允许，优惠才会展示。', install: '复制安装命令', installed: '命令已复制', copyCode: '复制 Web 代码', codeCopied: '代码已复制', copyFailed: '剪贴板不可用，请手动复制下方链接或代码。', shareLink: '分享链接', nextStep: '前进到下次可用时间', memory: '演练使用内存和模拟时钟；生成的 Web 代码使用 localStorage 和设备时钟。', title: '运行真实引擎。', intro: '组合全部 v1 规则、推进时间并分享可复现状态。', rules: '规则', result: '结果', key: 'Key', calendar: '日历周期上限', period: '周期', maximum: '最大次数', cutoff: '业务日界线', weekStarts: '每周起始日', window: '滑动窗口', days: '窗口天数', cooldown: '冷却时间', hours: '小时', lifetime: '终身上限', consume: '尝试消费', peek: '只读检查', reset: '重置', advance: '前进 4 小时', share: '复制分享链接', copied: '链接已复制', allowed: '允许', denied: '拒绝', remaining: '剩余额度', next: '下次可用', deniedBy: '拒绝规则', time: '模拟时间', setTime: '设置时间', record: '记录 JSON', import: '导入记录', export: '导出记录', invalid: '记录 JSON 无效', feedback: '接入求助与使用反馈', example: 'React 接入示例', code: '生成的 TypeScript', privacy: '规则在本地运行，分享链接包含 key 与记录。若启用网站统计，仅发送过滤后的页面访问及显式演练、复制和链接操作，不发送 key 或记录。', enabled: '启用', sunday: '星期日', monday: '星期一',
   },
 }
 
@@ -32,6 +33,8 @@ export default function Playground({ locale = 'en', compact = false }: Props) {
   const [ready, setReady] = useState(false)
   const [copied, setCopied] = useState(false)
   const [codeCopied, setCodeCopied] = useState(false)
+  const [installCopied, setInstallCopied] = useState(false)
+  const demoOutcomes = useRef({ allowed: false, denied: false, complete: false })
   const [copyError, setCopyError] = useState('')
   const [shareUrl, setShareUrl] = useState('')
   const [couponOpen, setCouponOpen] = useState(false)
@@ -65,7 +68,16 @@ export default function Playground({ locale = 'en', compact = false }: Props) {
       ? fatigue.tryConsume(configuration.key, rules)
       : fatigue.peek(configuration.key, rules)
     setResult(next)
-    if (action === 'consume') setCouponOpen(next.allowed)
+    if (action === 'consume') {
+      setCouponOpen(next.allowed)
+      const outcome = next.allowed ? 'allowed' : 'denied'
+      trackSiteEvent('demo_interact', { outcome })
+      demoOutcomes.current[outcome] = true
+      if (demoOutcomes.current.allowed && demoOutcomes.current.denied && !demoOutcomes.current.complete) {
+        trackSiteEvent('demo_complete')
+        demoOutcomes.current.complete = true
+      }
+    }
     if (action === 'reset') setCouponOpen(false)
     const record = fatigue.exportRecord(configuration.key)
     setRecordText(JSON.stringify(record, null, 2))
@@ -95,19 +107,23 @@ export default function Playground({ locale = 'en', compact = false }: Props) {
     try {
       await navigator.clipboard.writeText(url.toString())
       setCopied(true)
+      trackSiteEvent('share_copy')
       window.setTimeout(() => setCopied(false), 1500)
     } catch {
       setCopyError(text.copyFailed)
     }
   }
 
-  async function copyCode() {
+  async function copyCode(kind: 'code' | 'install') {
     setCodeCopied(false)
+    setInstallCopied(false)
     setCopyError('')
     try {
-      await navigator.clipboard.writeText(generateCode(configuration))
-      setCodeCopied(true)
-      window.setTimeout(() => setCodeCopied(false), 1500)
+      await navigator.clipboard.writeText(kind === 'code' ? generateCode(configuration) : 'npm install fatigue-kit')
+      if (kind === 'code') setCodeCopied(true)
+      else setInstallCopied(true)
+      trackSiteEvent(kind === 'code' ? 'code_copy' : 'install_copy')
+      window.setTimeout(() => { setCodeCopied(false); setInstallCopied(false) }, 1500)
     } catch {
       setCopyError(text.copyFailed)
     }
@@ -138,8 +154,8 @@ export default function Playground({ locale = 'en', compact = false }: Props) {
       <pre tabIndex={0} aria-label="Active frequency rules"><code>{JSON.stringify(rules, null, 2)}</code></pre>
       <dl><div><dt>{text.remaining}</dt><dd>{String(result.remaining)}</dd></div><div><dt>{text.time}</dt><dd>{new Date(configuration.now).toISOString()}</dd></div>{result.nextAvailableAt !== undefined && <div><dt>{text.next}</dt><dd>{new Date(result.nextAvailableAt).toISOString()}</dd></div>}{result.deniedBy !== undefined && <div><dt>{text.deniedBy}</dt><dd>{JSON.stringify(result.deniedBy)}</dd></div>}</dl>
       <div className="playground__actions"><button type="button" disabled={!ready} onClick={() => refresh('consume')}>{text.consume}</button><button type="button" onClick={() => refresh('peek')}>{text.peek}</button><button type="button" onClick={() => refresh('reset')}>{text.reset}</button><button type="button" onClick={() => update('now', configuration.now + 4 * 60 * 60 * 1000)}>{text.advance}</button>{result.nextAvailableAt !== undefined && Number.isFinite(result.nextAvailableAt) && <button type="button" onClick={() => update('now', result.nextAvailableAt!)}>{text.nextStep}</button>}{!compact && <button type="button" onClick={share}>{copied ? text.copied : text.share}</button>}</div>
-      {!compact && <><label>{text.setTime}<input type="datetime-local" value={formatLocalDateTime(configuration.now)} onChange={(event) => update('now', new Date(event.currentTarget.value).getTime())} /></label><label>{text.record}<textarea rows={6} value={recordText} onChange={(event) => setRecordText(event.currentTarget.value)} aria-describedby="record-error" /></label><p id="record-error" role="alert">{recordError}</p><button type="button" onClick={importRecord}>{text.import}</button><h3>{text.code}</h3><pre tabIndex={0} aria-label={text.code}><code>{generateCode(configuration)}</code></pre><button type="button" onClick={copyCode}>{codeCopied ? text.codeCopied : text.copyCode}</button><p role="status">{copyError}</p>{copyError && shareUrl && <label>{text.shareLink}<input readOnly value={shareUrl} onFocus={(event) => event.currentTarget.select()} /></label>}<p className="playground__privacy">{text.privacy}</p></>}
-      {!compact && <nav className="playground__actions" aria-label={text.feedback}><a href={`${base}/${locale === 'zh-CN' ? 'zh-cn/' : ''}docs/api/react/`}>{text.example}</a><a href={`${base}/${locale === 'zh-CN' ? 'zh-cn/' : ''}docs/project/feedback/`}>{text.feedback}</a></nav>}
+      {!compact && <><label>{text.setTime}<input type="datetime-local" value={formatLocalDateTime(configuration.now)} onChange={(event) => update('now', new Date(event.currentTarget.value).getTime())} /></label><label>{text.record}<textarea rows={6} value={recordText} onChange={(event) => setRecordText(event.currentTarget.value)} aria-describedby="record-error" /></label><p id="record-error" role="alert">{recordError}</p><button type="button" onClick={importRecord}>{text.import}</button><h3>{text.code}</h3><pre><code>npm install fatigue-kit</code></pre><button type="button" onClick={() => copyCode('install')}>{installCopied ? text.installed : text.install}</button><pre tabIndex={0} aria-label={text.code}><code>{generateCode(configuration)}</code></pre><button type="button" onClick={() => copyCode('code')}>{codeCopied ? text.codeCopied : text.copyCode}</button><p role="status">{copyError}</p>{copyError && shareUrl && <label>{text.shareLink}<input readOnly value={shareUrl} onFocus={(event) => event.currentTarget.select()} /></label>}<p className="playground__privacy">{text.privacy}</p></>}
+      {!compact && <nav className="playground__actions" aria-label={text.feedback}><a data-analytics-event="example_open" href={`${base}/${locale === 'zh-CN' ? 'zh-cn/' : ''}docs/api/react/`}>{text.example}</a><a data-analytics-event="feedback_open" href={`${base}/${locale === 'zh-CN' ? 'zh-cn/' : ''}docs/project/feedback/`}>{text.feedback}</a></nav>}
       <style>{styles}</style>
     </section>
   )
