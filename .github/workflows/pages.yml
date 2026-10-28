@@ -39,7 +39,7 @@ jobs:
           FATIGUE_TEST_ANALYTICS: '1'
       - run: npm run test:server --workspace @fatigue-kit/website
       - run: npm run lighthouse --workspace @fatigue-kit/website
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v5
         if: github.event_name != 'pull_request'
         with:
           path: website/dist
