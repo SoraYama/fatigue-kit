@@ -13,7 +13,7 @@
     "lighthouse": "node scripts/lighthouse.mjs"
   },
   "dependencies": {
-    "@astrojs/react": "^7.1.1",
+    "@astrojs/react": "^7.1.4",
     "@astrojs/sitemap": "^3.7.4",
     "@astrojs/starlight": "^0.42.6",
     "astro": "^7.4.2",
