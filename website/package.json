@@ -24,10 +24,10 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.6",
     "@axe-core/playwright": "^4.10.2",
-    "@playwright/test": "^1.56.1",
+    "@playwright/test": "^1.65.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
-    "lighthouse": "^13.5.0",
+    "lighthouse": "^13.6.0",
     "typescript": "^6.0.3"
   }
 }
